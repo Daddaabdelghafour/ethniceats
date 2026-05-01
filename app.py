@@ -47,6 +47,7 @@ from services.mysql_user_service import (
     get_favoris,
     get_preferences,
     get_utilisateur,
+    get_utilisateur_by_reset_token,
     remove_favori,
     set_email_verified,
     set_preferences,
@@ -575,7 +576,7 @@ def update_password(user_id):
     utilisateur = get_utilisateur(user_id)
     if not utilisateur:
         return jsonify({"success": False, "message": "Utilisateur introuvable."}), 404
-    if not verify_password(utilisateur.get("email", ""), ancien):
+    if verify_password(utilisateur.get("email", ""), ancien) is None:
         return jsonify({"success": False, "message": "Mot de passe actuel incorrect."}), 403
     if not update_utilisateur(user_id, {"motDePasse": nouveau}):
         return jsonify({"success": False, "message": "Mise à jour impossible."}), 500
@@ -595,6 +596,21 @@ def reset_password_request():
     if not set_reset_token(email, token, expires_at):
         return jsonify({"success": False, "message": "Impossible de créer la demande."}), 500
     return jsonify({"success": True, "message": "Demande enregistrée."})
+
+
+@app.route("/api/password/reset", methods=["POST"])
+def reset_password():
+    data = request.get_json() or {}
+    token = data.get("token")
+    nouveau = data.get("nouveauMdp")
+    if not token or not nouveau:
+        return jsonify({"success": False, "message": "Token et nouveau mot de passe requis."}), 400
+    utilisateur = get_utilisateur_by_reset_token(token)
+    if not utilisateur:
+        return jsonify({"success": False, "message": "Token invalide ou expiré."}), 404
+    if not update_utilisateur(utilisateur["uid"], {"motDePasse": nouveau, "resetToken": None, "resetTokenExpires": None}):
+        return jsonify({"success": False, "message": "Impossible de réinitialiser le mot de passe."}), 500
+    return jsonify({"success": True, "message": "Mot de passe réinitialisé."})
 
 
 @app.route("/api/users/<user_id>/preferences", methods=["GET"])
@@ -637,10 +653,12 @@ def remove_user_favori(user_id, recette_id):
 @app.route("/api/commandes", methods=["POST"])
 def create_commande_route():
     data = request.get_json() or {}
-    if not data.get("id") or not data.get("clientId"):
+    if not data.get("clientId"):
         return jsonify({"success": False, "message": "Commande invalide."}), 400
+    if not data.get("id"):
+        data["id"] = f"ORD-{uuid.uuid4().hex[:8].upper()}"
     if create_commande(data):
-        return jsonify({"success": True})
+        return jsonify({"success": True, "commandeId": data["id"]})
     return jsonify({"success": False, "message": "Erreur lors de la création."}), 500
 
 

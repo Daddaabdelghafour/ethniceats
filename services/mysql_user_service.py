@@ -1,6 +1,7 @@
 # EthnicEats — services/mysql_user_service.py
 # User-related database operations using MySQL
 import json
+import re
 from typing import Any, Dict, Optional
 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -9,6 +10,14 @@ from .mysql_service import get_db_connection
 
 
 JSON_FIELDS = {"favoris", "adresseLivraison"}
+
+
+def _validate_columns(fields) -> bool:
+    for field in fields:
+        column = field.split("=", 1)[0].strip()
+        if not re.match(r"^[a-zA-Z_]+$", column):
+            return False
+    return True
 
 
 def _serialize_json(value: Any) -> Any:
@@ -50,6 +59,8 @@ def create_utilisateur(user_data: Dict[str, Any]) -> bool:
     try:
         with conn.cursor() as cur:
             mot_de_passe = user_data.get("motDePasse") or ""
+            if not mot_de_passe:
+                return False
             mot_de_passe_hash = generate_password_hash(mot_de_passe)
             cur.execute(
                 '''
@@ -189,6 +200,9 @@ def update_utilisateur(user_id: str, updates: Dict[str, Any]) -> bool:
     if not fields:
         return False
 
+    if not _validate_columns(fields):
+        return False
+
     conn = get_db_connection()
     if not conn:
         return False
@@ -260,3 +274,23 @@ def remove_favori(user_id: str, recette_id: str) -> list:
         favoris = [fav for fav in favoris if fav != recette_id]
         update_utilisateur(user_id, {"favoris": favoris})
     return favoris
+
+
+def get_utilisateur_by_reset_token(token: str) -> Optional[Dict[str, Any]]:
+    conn = get_db_connection()
+    if not conn:
+        return None
+    try:
+        with conn.cursor(dictionary=True) as cur:
+            cur.execute(
+                '''
+                SELECT * FROM utilisateurs
+                WHERE resetToken = %s
+                AND (resetTokenExpires IS NULL OR resetTokenExpires > NOW())
+                ''',
+                (token,),
+            )
+            row = cur.fetchone()
+            return _sanitize_utilisateur(row)
+    finally:
+        conn.close()

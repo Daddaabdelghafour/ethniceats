@@ -1,12 +1,21 @@
 # EthnicEats — services/mysql_commande_service.py
 # Commande-related database operations using MySQL
 import json
+import re
 from typing import Any, Dict, List, Optional
 
 from .mysql_service import get_db_connection
 
 
 JSON_FIELDS = {"panier", "pointsCollecte", "adresseLivraison"}
+
+
+def _validate_columns(fields) -> bool:
+    for field in fields:
+        column = field.split("=", 1)[0].strip()
+        if not re.match(r"^[a-zA-Z_]+$", column):
+            return False
+    return True
 
 
 def _serialize_json(value: Any) -> Any:
@@ -120,6 +129,9 @@ def update_commande(commande_id: str, updates: Dict[str, Any]) -> bool:
         values.append(value)
 
     if not fields:
+        return False
+
+    if not _validate_columns(fields):
         return False
 
     fields.append("updatedAt = NOW()")

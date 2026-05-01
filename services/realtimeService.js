@@ -3,22 +3,31 @@
 //  Polling simple via API Flask (remplacement Firebase RTDB)
 // ============================================================
 
-const POLL_INTERVAL_MS = 5000;
+const POLL_INTERVAL_MS = 3000;
 
 async function _fetchJson(url, options = {}) {
   const res = await fetch(url, {
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
     ...options,
   });
-  const data = await res.json().catch(() => ({}));
-  return { ok: res.ok, data };
+  try {
+    const data = await res.json();
+    return { ok: res.ok, data };
+  } catch (error) {
+    console.warn("[realtimeService] Réponse JSON invalide", error);
+    return { ok: false, data: {} };
+  }
 }
 
 function _createPoller(fn) {
   let active = true;
   const tick = async () => {
     if (!active) return;
-    await fn();
+    try {
+      await fn();
+    } catch (error) {
+      console.error("[realtimeService] Polling error", error);
+    }
   };
   tick();
   const id = setInterval(tick, POLL_INTERVAL_MS);
@@ -87,15 +96,28 @@ export function ecouterNouvellesCommandes(callback) {
   });
 }
 
-export function ecouterInfosLivreur(livreurId, callback) {
-  if (!livreurId || typeof livreurId !== "string") {
-    throw new Error("ecouterInfosLivreur : livreurId est obligatoire.");
+export function ecouterInfosLivreur(idOrLivreurId, callback) {
+  if (!idOrLivreurId || typeof idOrLivreurId !== "string") {
+    throw new Error("ecouterInfosLivreur : identifiant requis.");
   }
   if (typeof callback !== "function") {
     throw new Error("ecouterInfosLivreur : callback doit être une fonction.");
   }
 
+  const isCommandeId = idOrLivreurId.startsWith("ORD-");
+
   return _createPoller(async () => {
+    let livreurId = idOrLivreurId;
+
+    if (isCommandeId) {
+      const { ok, data } = await _fetchJson(`/api/commandes/${idOrLivreurId}`);
+      if (!ok || !data.success || !data.commande?.livreurId) {
+        callback(null, null);
+        return;
+      }
+      livreurId = data.commande.livreurId;
+    }
+
     const { ok, data } = await _fetchJson(`/api/users/${livreurId}`);
     if (!ok || !data.success || !data.user) {
       callback(null, null);

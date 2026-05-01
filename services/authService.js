@@ -36,7 +36,8 @@ async function _fetchJson(url, options = {}) {
 }
 
 function _storeUser(user) {
-  localStorage.setItem(STORAGE_USER, JSON.stringify(user));
+  if (!user?.uid) return;
+  localStorage.setItem(STORAGE_USER, JSON.stringify({ uid: user.uid }));
 }
 
 function _clearUser() {
@@ -51,6 +52,13 @@ function _getStoredUser() {
   } catch {
     return null;
   }
+}
+
+function _clearPendingSession() {
+  sessionStorage.removeItem(SESSION_KEYS.uidPending);
+  sessionStorage.removeItem(SESSION_KEYS.rolePending);
+  sessionStorage.removeItem(SESSION_KEYS.emailPending);
+  sessionStorage.removeItem(SESSION_KEYS.verificationToken);
 }
 
 // ─── register ────────────────────────────────────────────────────────────────
@@ -99,7 +107,8 @@ async function login(email, motDePasse) {
     });
 
     if (!ok || !data.success) {
-      if (data?.user?.uid) {
+      _clearPendingSession();
+      if (data?.emailVerifie === false && data?.user?.uid) {
         sessionStorage.setItem(SESSION_KEYS.uidPending, data.user.uid);
         sessionStorage.setItem(SESSION_KEYS.rolePending, data.user.role || "");
         sessionStorage.setItem(SESSION_KEYS.emailPending, data.user.email || "");
@@ -251,16 +260,15 @@ async function modifierMotDePasse(ancienMdp, nouveauMdp) {
 // ─── getCurrentUser ──────────────────────────────────────────────────────────
 
 async function getCurrentUser() {
-  const user = _getStoredUser();
-  if (!user) return null;
+  const userRef = _getStoredUser();
+  if (!userRef?.uid) return null;
 
-  const { ok, data } = await _fetchJson(`/api/users/${user.uid}`);
+  const { ok, data } = await _fetchJson(`/api/users/${userRef.uid}`);
   if (ok && data.user) {
-    _storeUser(data.user);
     return data.user;
   }
 
-  return user;
+  return null;
 }
 
 async function renvoyerEmailVerification() {

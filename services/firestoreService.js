@@ -67,7 +67,8 @@ export async function sauvegarderCommande(commande) {
       throw new Error("sauvegarderCommande : commande.id est obligatoire.");
     }
 
-    const isCreate = Boolean(commande.clientId) || Boolean(commande.panier);
+    const existing = await getCommande(commande.id);
+    const isCreate = !existing;
     const url = isCreate ? "/api/commandes" : `/api/commandes/${commande.id}`;
     const method = isCreate ? "POST" : "PUT";
     const payload = isCreate ? commande : { ...commande };
