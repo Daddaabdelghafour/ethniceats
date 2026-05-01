@@ -1,82 +1,55 @@
 // ============================================================
 //  EthnicEats — services/firestoreService.js
-//  Couche d'accès Firestore — Architecture MVC
-//
-//  Collections :
-//    utilisateurs/{userId}
-//    commandes/{commandeId}
-//    utilisateurs/{clientId}/favoris/{recetteId}
-//    utilisateurs/{clientId}/preferences   (document unique)
-//
-//  ⚠️  Les recettes sont stockées LOCALEMENT dans data/recettes.js
-//      et ne sont PAS persistées dans Firestore.
+//  Couche d'accès MySQL via API Flask
 // ============================================================
 
-import { db } from './firebase.js';
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  serverTimestamp,
-  orderBy,
-} from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+async function _fetchJson(url, options = {}) {
+  const res = await fetch(url, {
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    ...options,
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, data };
+}
 
 // ─────────────────────────────────────────────────────────────
 //  UTILISATEURS
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Sauvegarde (création ou mise à jour) d'un utilisateur dans Firestore.
- * @param {string} userId  - UID Firebase Auth
- * @param {Object} données - plain object issu de Client.versObjet() ou Livreur.versObjet()
- * @returns {Promise<void>}
- */
 export async function sauvegarderUtilisateur(userId, données) {
   try {
-    if (!userId || typeof userId !== 'string') {
-      throw new Error('sauvegarderUtilisateur : userId invalide.');
+    if (!userId || typeof userId !== "string") {
+      throw new Error("sauvegarderUtilisateur : userId invalide.");
     }
-    if (!données || typeof données !== 'object') {
-      throw new Error('sauvegarderUtilisateur : données invalides.');
+    if (!données || typeof données !== "object") {
+      throw new Error("sauvegarderUtilisateur : données invalides.");
     }
 
-    const ref = doc(db, 'utilisateurs', userId);
-    await setDoc(ref, {
-      ...données,
-      updatedAt: serverTimestamp(),
-    }, { merge: true });
+    const { ok, data } = await _fetchJson(`/api/users/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(données),
+    });
 
+    if (!ok || !data.success) {
+      throw new Error(data.message || "Erreur lors de la sauvegarde.");
+    }
   } catch (error) {
-    console.error('[firestoreService] sauvegarderUtilisateur :', error);
+    console.error("[firestoreService] sauvegarderUtilisateur :", error);
     throw error;
   }
 }
 
-/**
- * Récupère un utilisateur par son UID.
- * @param {string} userId
- * @returns {Promise<Object|null>} plain object ou null si introuvable
- */
 export async function getUtilisateur(userId) {
   try {
-    if (!userId || typeof userId !== 'string') {
-      throw new Error('getUtilisateur : userId invalide.');
+    if (!userId || typeof userId !== "string") {
+      throw new Error("getUtilisateur : userId invalide.");
     }
 
-    const ref  = doc(db, 'utilisateurs', userId);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) return null;
-    return { id: snap.id, ...snap.data() };
-
+    const { ok, data } = await _fetchJson(`/api/users/${userId}`);
+    if (!ok || !data.success) return null;
+    return data.user ?? null;
   } catch (error) {
-    console.error('[firestoreService] getUtilisateur :', error);
+    console.error("[firestoreService] getUtilisateur :", error);
     throw error;
   }
 }
@@ -85,146 +58,118 @@ export async function getUtilisateur(userId) {
 //  COMMANDES
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Sauvegarde (création ou mise à jour) d'une commande dans Firestore.
- * @param {Object} commande - plain object issu de Commande.versObjet()
- * @returns {Promise<void>}
- */
 export async function sauvegarderCommande(commande) {
   try {
-    if (!commande || typeof commande !== 'object') {
-      throw new Error('sauvegarderCommande : commande invalide.');
+    if (!commande || typeof commande !== "object") {
+      throw new Error("sauvegarderCommande : commande invalide.");
     }
-    if (!commande.id || typeof commande.id !== 'string') {
-      throw new Error('sauvegarderCommande : commande.id est obligatoire.');
+    if (!commande.id || typeof commande.id !== "string") {
+      throw new Error("sauvegarderCommande : commande.id est obligatoire.");
     }
 
-    const ref = doc(db, 'commandes', commande.id);
-    await setDoc(ref, {
-      ...commande,
-      updatedAt: serverTimestamp(),
-    }, { merge: true });
+    const isCreate = Boolean(commande.clientId) || Boolean(commande.panier);
+    const url = isCreate ? "/api/commandes" : `/api/commandes/${commande.id}`;
+    const method = isCreate ? "POST" : "PUT";
+    const payload = isCreate ? commande : { ...commande };
 
+    const { ok, data } = await _fetchJson(url, {
+      method,
+      body: JSON.stringify(payload),
+    });
+
+    if (!ok || !data.success) {
+      throw new Error(data.message || "Erreur lors de la sauvegarde.");
+    }
   } catch (error) {
-    console.error('[firestoreService] sauvegarderCommande :', error);
+    console.error("[firestoreService] sauvegarderCommande :", error);
     throw error;
   }
 }
 
-/**
- * Récupère toutes les commandes d'un client donné (actives + historique).
- * @param {string} clientId
- * @returns {Promise<Array<Object>>}
- */
+export async function getCommande(commandeId) {
+  try {
+    if (!commandeId || typeof commandeId !== "string") {
+      throw new Error("getCommande : commandeId invalide.");
+    }
+    const { ok, data } = await _fetchJson(`/api/commandes/${commandeId}`);
+    if (!ok || !data.success) return null;
+    return data.commande ?? null;
+  } catch (error) {
+    console.error("[firestoreService] getCommande :", error);
+    throw error;
+  }
+}
+
 export async function getCommandesClient(clientId) {
   try {
-    if (!clientId || typeof clientId !== 'string') {
-      throw new Error('getCommandesClient : clientId invalide.');
+    if (!clientId || typeof clientId !== "string") {
+      throw new Error("getCommandesClient : clientId invalide.");
     }
-
-    // La combinaison `where(...) + orderBy(...)` peut nécessiter un index composite.
-    // En environnement de démo/dev, cet index n'est pas toujours créé → la requête échoue.
-    // Fallback : requête sans orderBy + tri côté client.
-    try {
-      const q    = query(
-        collection(db, 'commandes'),
-        where('clientId', '==', clientId),
-        orderBy('dateCreation', 'desc')
-      );
-      const snap = await getDocs(q);
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    } catch (error) {
-      const msg = String(error?.message || '').toLowerCase();
-      const needsIndex = msg.includes('requires an index') || msg.includes('failed_precondition') || msg.includes('failed precondition');
-      if (!needsIndex) throw error;
-
-      const q2    = query(
-        collection(db, 'commandes'),
-        where('clientId', '==', clientId)
-      );
-      const snap2 = await getDocs(q2);
-      const commandes = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
-
-      commandes.sort((a, b) => {
-        const da = Date.parse(a.dateCreation || '') || 0;
-        const dbb = Date.parse(b.dateCreation || '') || 0;
-        return dbb - da;
-      });
-
-      return commandes;
-    }
-
+    const { ok, data } = await _fetchJson(`/api/commandes?clientId=${clientId}`);
+    if (!ok || !data.success) return [];
+    return data.commandes ?? [];
   } catch (error) {
-    console.error('[firestoreService] getCommandesClient :', error);
+    console.error("[firestoreService] getCommandesClient :", error);
     throw error;
   }
 }
 
-/**
- * Récupère les commandes disponibles pour les livreurs.
- * Une commande est "disponible" quand son statut est "commande_passee"
- * et qu'aucun livreur n'y est encore assigné (livreurId vide).
- * @returns {Promise<Array<Object>>}
- */
 export async function getCommandesDisponibles() {
   try {
-    const q    = query(
-      collection(db, 'commandes'),
-      where('statut', '==', 'commande_passee'),
-      where('livreurId', '==', ''),
-      orderBy('dateCreation', 'asc')
-    );
-    const snap = await getDocs(q);
-
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
+    const { ok, data } = await _fetchJson("/api/commandes/disponibles");
+    if (!ok || !data.success) return [];
+    return data.commandes ?? [];
   } catch (error) {
-    console.error('[firestoreService] getCommandesDisponibles :', error);
+    console.error("[firestoreService] getCommandesDisponibles :", error);
     throw error;
   }
 }
 
-/**
- * Met à jour le statut d'une commande.
- * Quand le statut passe à "livree", la commande est automatiquement
- * marquée comme archivée (archivee: true).
- * @param {string} commandeId
- * @param {string} statut - valeur parmi Commande.STATUTS
- * @returns {Promise<void>}
- */
+export async function getCommandesLivreurEnCours(livreurId, statuts = null) {
+  try {
+    if (!livreurId || typeof livreurId !== "string") {
+      throw new Error("getCommandesLivreurEnCours : livreurId invalide.");
+    }
+    const url = statuts && statuts.length
+      ? `/api/commandes?livreurId=${livreurId}&statut=${statuts.join(",")}`
+      : `/api/commandes/livreur/en-cours?livreurId=${livreurId}`;
+    const { ok, data } = await _fetchJson(url);
+    if (!ok || !data.success) return [];
+    return data.commandes ?? [];
+  } catch (error) {
+    console.error("[firestoreService] getCommandesLivreurEnCours :", error);
+    throw error;
+  }
+}
+
 export async function mettreAJourStatutCommande(commandeId, statut) {
   try {
-    if (!commandeId || typeof commandeId !== 'string') {
-      throw new Error('mettreAJourStatutCommande : commandeId invalide.');
+    if (!commandeId || typeof commandeId !== "string") {
+      throw new Error("mettreAJourStatutCommande : commandeId invalide.");
     }
 
     const statutsValides = [
-      'commande_passee',
-      'confirmee',
-      'en_preparation',
-      'en_livraison',
-      'arrive',
-      'livree',
+      "commande_passee",
+      "confirmee",
+      "en_preparation",
+      "en_livraison",
+      "arrive",
+      "livree",
     ];
     if (!statutsValides.includes(statut)) {
       throw new Error(`mettreAJourStatutCommande : statut invalide → "${statut}".`);
     }
 
-    const ref      = doc(db, 'commandes', commandeId);
-    const données  = {
-      statut,
-      updatedAt: serverTimestamp(),
-    };
+    const { ok, data } = await _fetchJson(`/api/commandes/${commandeId}`, {
+      method: "PUT",
+      body: JSON.stringify({ statut }),
+    });
 
-    // Archivage automatique dès que la commande est livrée
-    if (statut === 'livree') {
-      données.archivee = true;
+    if (!ok || !data.success) {
+      throw new Error(data.message || "Erreur lors de la mise à jour.");
     }
-
-    await updateDoc(ref, données);
-
   } catch (error) {
-    console.error('[firestoreService] mettreAJourStatutCommande :', error);
+    console.error("[firestoreService] mettreAJourStatutCommande :", error);
     throw error;
   }
 }
@@ -233,70 +178,48 @@ export async function mettreAJourStatutCommande(commandeId, statut) {
 //  FAVORIS
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Ajoute une recette aux favoris d'un client.
- * Stocké dans : utilisateurs/{clientId}/favoris/{recetteId}
- * @param {string} clientId
- * @param {string} recetteId
- * @returns {Promise<void>}
- */
 export async function ajouterFavori(clientId, recetteId) {
   try {
-    if (!clientId  || typeof clientId  !== 'string') throw new Error('ajouterFavori : clientId invalide.');
-    if (!recetteId || typeof recetteId !== 'string') throw new Error('ajouterFavori : recetteId invalide.');
+    if (!clientId || typeof clientId !== "string") throw new Error("ajouterFavori : clientId invalide.");
+    if (!recetteId || typeof recetteId !== "string") throw new Error("ajouterFavori : recetteId invalide.");
 
-    const ref = doc(db, 'utilisateurs', clientId, 'favoris', recetteId);
-    await setDoc(ref, {
-      recetteId,
-      ajouteLe: serverTimestamp(),
+    const { ok, data } = await _fetchJson(`/api/users/${clientId}/favoris`, {
+      method: "POST",
+      body: JSON.stringify({ recetteId }),
     });
-
+    if (!ok || !data.success) throw new Error(data.message || "Erreur lors de l'ajout.");
   } catch (error) {
-    console.error('[firestoreService] ajouterFavori :', error);
+    console.error("[firestoreService] ajouterFavori :", error);
     throw error;
   }
 }
 
-/**
- * Retire une recette des favoris d'un client.
- * @param {string} clientId
- * @param {string} recetteId
- * @returns {Promise<void>}
- */
 export async function supprimerFavori(clientId, recetteId) {
   try {
-    if (!clientId  || typeof clientId  !== 'string') throw new Error('supprimerFavori : clientId invalide.');
-    if (!recetteId || typeof recetteId !== 'string') throw new Error('supprimerFavori : recetteId invalide.');
+    if (!clientId || typeof clientId !== "string") throw new Error("supprimerFavori : clientId invalide.");
+    if (!recetteId || typeof recetteId !== "string") throw new Error("supprimerFavori : recetteId invalide.");
 
-    const ref = doc(db, 'utilisateurs', clientId, 'favoris', recetteId);
-    await deleteDoc(ref);
-
+    const { ok, data } = await _fetchJson(`/api/users/${clientId}/favoris/${recetteId}`, {
+      method: "DELETE",
+    });
+    if (!ok || !data.success) throw new Error(data.message || "Erreur lors de la suppression.");
   } catch (error) {
-    console.error('[firestoreService] supprimerFavori :', error);
+    console.error("[firestoreService] supprimerFavori :", error);
     throw error;
   }
 }
 
-/**
- * Récupère la liste des recetteId mis en favoris par un client.
- * La correspondance avec les objets Recette se fait côté contrôleur
- * en croisant avec data/recettes.js (les recettes ne sont pas dans Firestore).
- * @param {string} clientId
- * @returns {Promise<Array<string>>} tableau de recetteId
- */
 export async function getFavoris(clientId) {
   try {
-    if (!clientId || typeof clientId !== 'string') {
-      throw new Error('getFavoris : clientId invalide.');
+    if (!clientId || typeof clientId !== "string") {
+      throw new Error("getFavoris : clientId invalide.");
     }
 
-    const ref  = collection(db, 'utilisateurs', clientId, 'favoris');
-    const snap = await getDocs(ref);
-
-    return snap.docs.map(d => d.id); // le doc ID est le recetteId
-
+    const { ok, data } = await _fetchJson(`/api/users/${clientId}/favoris`);
+    if (!ok || !data.success) return [];
+    return data.favoris ?? [];
   } catch (error) {
-    console.error('[firestoreService] getFavoris :', error);
+    console.error("[firestoreService] getFavoris :", error);
     throw error;
   }
 }
@@ -305,66 +228,30 @@ export async function getFavoris(clientId) {
 //  HISTORIQUE
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Récupère l'historique des commandes livrées pour un client.
- * (uniquement les commandes au statut "livree")
- * @param {string} clientId
- * @returns {Promise<Array<Object>>}
- */
 export async function getHistoriqueClient(clientId) {
   try {
-    if (!clientId || typeof clientId !== 'string') {
-      throw new Error('getHistoriqueClient : clientId invalide.');
+    if (!clientId || typeof clientId !== "string") {
+      throw new Error("getHistoriqueClient : clientId invalide.");
     }
-
-    const q    = query(
-      collection(db, 'commandes'),
-      where('clientId', '==', clientId),
-      where('statut',   '==', 'livree'),
-      orderBy('dateCreation', 'desc')
-    );
-    const snap = await getDocs(q);
-
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
+    const { ok, data } = await _fetchJson(`/api/commandes/historique?clientId=${clientId}`);
+    if (!ok || !data.success) return [];
+    return data.commandes ?? [];
   } catch (error) {
-    console.error('[firestoreService] getHistoriqueClient :', error);
+    console.error("[firestoreService] getHistoriqueClient :", error);
     throw error;
   }
 }
 
-/**
- * Récupère l'historique des commandes livrées par un livreur.
- * (commandes au statut "livree" assignées à ce livreur)
- * @param {string} livreurId
- * @returns {Promise<Array<Object>>}
- */
 export async function getHistoriqueLivreur(livreurId) {
   try {
-    if (!livreurId || typeof livreurId !== 'string') {
-      throw new Error('getHistoriqueLivreur : livreurId invalide.');
+    if (!livreurId || typeof livreurId !== "string") {
+      throw new Error("getHistoriqueLivreur : livreurId invalide.");
     }
-
-    const q    = query(
-      collection(db, 'commandes'),
-      where('livreurId', '==', livreurId),
-      where('statut',    '==', 'livree')
-    );
-    const snap = await getDocs(q);
-
-    const commandes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    // Tri côté client du plus récent au plus ancien
-    commandes.sort((a, b) => {
-      const da  = Date.parse(a.dateCreation || '') || 0;
-      const db_ = Date.parse(b.dateCreation || '') || 0;
-      return db_ - da;
-    });
-
-    return commandes;
-
+    const { ok, data } = await _fetchJson(`/api/commandes/historique?livreurId=${livreurId}`);
+    if (!ok || !data.success) return [];
+    return data.commandes ?? [];
   } catch (error) {
-    console.error('[firestoreService] getHistoriqueLivreur :', error);
+    console.error("[firestoreService] getHistoriqueLivreur :", error);
     throw error;
   }
 }
@@ -373,73 +260,37 @@ export async function getHistoriqueLivreur(livreurId) {
 //  PRÉFÉRENCES CLIENT
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Sauvegarde les préférences d'achat d'un client.
- * Stocké dans : utilisateurs/{clientId}/preferences (document unique)
- * @param {string} clientId
- * @param {Object} preferences - { budgetMax, sourcePreferee, priorite }
- * @returns {Promise<void>}
- */
 export async function sauvegarderPreferences(clientId, preferences) {
   try {
-    if (!clientId || typeof clientId !== 'string') {
-      throw new Error('sauvegarderPreferences : clientId invalide.');
+    if (!clientId || typeof clientId !== "string") {
+      throw new Error("sauvegarderPreferences : clientId invalide.");
     }
-    if (!preferences || typeof preferences !== 'object') {
-      throw new Error('sauvegarderPreferences : preferences invalides.');
-    }
-
-    const { budgetMax, sourcePreferee, priorite } = preferences;
-
-    if (typeof budgetMax !== 'number' || budgetMax < 0) {
-      throw new Error('sauvegarderPreferences : budgetMax invalide.');
+    if (!preferences || typeof preferences !== "object") {
+      throw new Error("sauvegarderPreferences : preferences invalides.");
     }
 
-    const sourcesValides   = ['souk', 'supermarche', 'mix'];
-    const prioritesValides = ['moins_cher', 'plus_rapide', 'plus_frais'];
-
-    if (!sourcesValides.includes(sourcePreferee)) {
-      throw new Error(`sauvegarderPreferences : sourcePreferee invalide → "${sourcePreferee}".`);
-    }
-    if (!prioritesValides.includes(priorite)) {
-      throw new Error(`sauvegarderPreferences : priorite invalide → "${priorite}".`);
-    }
-
-    const ref = doc(db, 'utilisateurs', clientId, 'preferences', 'prefs');
-    await setDoc(ref, {
-      budgetMax,
-      sourcePreferee,
-      priorite,
-      updatedAt: serverTimestamp(),
+    const { ok, data } = await _fetchJson(`/api/users/${clientId}/preferences`, {
+      method: "PUT",
+      body: JSON.stringify(preferences),
     });
-
+    if (!ok || !data.success) throw new Error(data.message || "Erreur lors de l'enregistrement.");
   } catch (error) {
-    console.error('[firestoreService] sauvegarderPreferences :', error);
+    console.error("[firestoreService] sauvegarderPreferences :", error);
     throw error;
   }
 }
 
-/**
- * Récupère les préférences d'achat d'un client.
- * @param {string} clientId
- * @returns {Promise<Object|null>} { budgetMax, sourcePreferee, priorite } ou null
- */
 export async function getPreferences(clientId) {
   try {
-    if (!clientId || typeof clientId !== 'string') {
-      throw new Error('getPreferences : clientId invalide.');
+    if (!clientId || typeof clientId !== "string") {
+      throw new Error("getPreferences : clientId invalide.");
     }
 
-    const ref  = doc(db, 'utilisateurs', clientId, 'preferences', 'prefs');
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) return null;
-
-    const { budgetMax, sourcePreferee, priorite } = snap.data();
-    return { budgetMax, sourcePreferee, priorite };
-
+    const { ok, data } = await _fetchJson(`/api/users/${clientId}/preferences`);
+    if (!ok || !data.success) return null;
+    return data.preferences ?? null;
   } catch (error) {
-    console.error('[firestoreService] getPreferences :', error);
+    console.error("[firestoreService] getPreferences :", error);
     throw error;
   }
 }

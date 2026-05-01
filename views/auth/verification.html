@@ -374,33 +374,14 @@
     btnResend.addEventListener("click", async () => {
       if (cooldownActive) return;
 
-      try {
-        const resultat = await renvoyerEmailVerification();
-        if (!resultat.success) {
-          showFeedback(resultat.message || "Impossible de renvoyer l'email. Veuillez vous reconnecter.");
-          return;
-        }
-
-        showToast("Email de vérification renvoyé ✓");
-        startCooldown();
-      } catch (err) {
-        // If the function doesn't exist in the service, try Firebase directly.
-        try {
-          const { getAuth, sendEmailVerification } = await import(
-            "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
-          );
-          const auth = getAuth();
-          if (auth.currentUser) {
-            await sendEmailVerification(auth.currentUser);
-            showToast("Email de vérification renvoyé ✓");
-            startCooldown();
-          } else {
-            showFeedback("Impossible de renvoyer l'email. Veuillez vous reconnecter.");
-          }
-        } catch (firebaseErr) {
-          showFeedback("Erreur lors du renvoi de l'email. Veuillez réessayer dans un moment.");
-        }
+      const resultat = await renvoyerEmailVerification();
+      if (!resultat.success) {
+        showFeedback(resultat.message || "Impossible de renvoyer l'email. Veuillez vous reconnecter.");
+        return;
       }
+
+      showToast("Email de vérification renvoyé ✓");
+      startCooldown();
     });
   </script>
 

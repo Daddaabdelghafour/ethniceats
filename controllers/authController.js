@@ -27,6 +27,7 @@ import {
   verifierEmail,
   modifierProfil,
   modifierMotDePasse,
+  demanderResetMotDePasse,
   getCurrentUser,
 } from "../services/authService.js";
 
@@ -491,22 +492,18 @@ async function handleMotDePasseOublie(email) {
       };
     }
 
-    // ── Envoi de l'email de réinitialisation ───────────────────────────────
-    const auth = getAuth();
-    await sendPasswordResetEmail(auth, email.trim());
+    const resultat = await demanderResetMotDePasse(email.trim());
+    if (!resultat.success) {
+      return {
+        success: false,
+        erreur: resultat.message || "Impossible d'envoyer la demande.",
+      };
+    }
 
     return { success: true };
 
   } catch (error) {
     console.error("[authController.handleMotDePasseOublie]", error.message);
-
-    // Cas spécifique : email introuvable dans Firebase
-    if (error.code === "auth/user-not-found") {
-      return {
-        success: false,
-        erreur: "Aucun compte n'est associé à cette adresse email.",
-      };
-    }
 
     return {
       success: false,
