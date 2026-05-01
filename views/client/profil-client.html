@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Mon profil</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode:"class",
+    theme:{ extend:{ colors:{
+      "primary":"#012d1d","on-primary":"#ffffff","primary-container":"#1b4332",
+      "primary-fixed":"#c1ecd4","primary-fixed-dim":"#a5d0b9","on-primary-fixed":"#002114",
+      "on-primary-fixed-variant":"#274e3d","on-primary-container":"#86af99","inverse-primary":"#a5d0b9",
+      "secondary":"#775a19","on-secondary":"#ffffff","secondary-container":"#fdd587",
+      "on-secondary-container":"#785a19","secondary-fixed":"#ffdea3","secondary-fixed-dim":"#e8c176","on-secondary-fixed":"#261900",
+      "surface":"#fbf9f8","surface-dim":"#dbdad9","surface-bright":"#fbf9f8",
+      "surface-container-lowest":"#ffffff","surface-container-low":"#f5f3f3",
+      "surface-container":"#efeded","surface-container-high":"#e9e8e7",
+      "surface-container-highest":"#e3e2e2","surface-variant":"#e3e2e2",
+      "on-surface":"#1b1c1c","on-surface-variant":"#414844",
+      "background":"#fbf9f8","on-background":"#1b1c1c",
+      "outline":"#717973","outline-variant":"#c1c8c2",
+      "error":"#ba1a1a","error-container":"#ffdad6","on-error":"#ffffff","on-error-container":"#93000a",
+      "inverse-surface":"#303030","inverse-on-surface":"#f2f0f0",
+      "tertiary":"#282622","on-tertiary":"#ffffff","tertiary-container":"#3e3b37",
+      "on-tertiary-container":"#aaa59f","surface-tint":"#3f6653",
+    }, borderRadius:{ DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px" },
+    fontFamily:{ headline:["Playfair Display","serif"], body:["Manrope","sans-serif"] }
+    }}
+  }
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  body { font-family:'Manrope',sans-serif; background:#fbf9f8; }
+  h1,h2,h3 { font-family:'Playfair Display',serif; }
+  .sidebar-item { color:#9ca3af; transition:all 0.2s; }
+  .sidebar-item:hover { color:#012d1d; background:rgba(1,45,29,0.05); border-radius:1rem; }
+  .sidebar-item.active { color:#012d1d; font-weight:700; background:rgba(1,45,29,0.07); border-radius:1rem; }
+  .sidebar-item.active .material-symbols-outlined { font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24; }
+  .menu-item { transition:all 0.15s; }
+  .menu-item:hover .arrow { transform:translateX(4px); }
+  .arrow { transition:transform 0.2s; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .skeleton { animation:pulse 1.5s ease-in-out infinite; background:#e5e2e1; border-radius:0.75rem; }
+</style>
+</head>
+<body class="min-h-screen text-on-surface">
+
+<!-- SIDEBAR DESKTOP -->
+<nav class="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col items-start px-4 py-10 gap-2 z-40">
+  <div class="mb-8 px-2"><h1 class="font-headline text-2xl text-primary font-bold">EthnicEats</h1></div>
+  <a href="/accueil" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">home</span>Accueil</a>
+  <a href="/panier" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">shopping_bag</span>Panier</a>
+  <a href="/suivi-commande" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">local_shipping</span>Suivi</a>
+  <a href="/profil-client" class="sidebar-item active flex items-center gap-3 w-full px-4 py-3 rounded-2xl"><span class="material-symbols-outlined">person</span>Profil</a>
+</nav>
+
+<!-- MAIN -->
+<main class="lg:ml-64 min-h-screen pb-12">
+  <!-- Header mobile -->
+  <header class="px-5 lg:px-10 pt-8 pb-4 lg:pt-10 text-center lg:text-center">
+    <h1 class="font-headline text-3xl lg:text-4xl text-primary font-bold">Mon profil</h1>
+  </header>
+
+  <!-- Skeleton -->
+  <div id="skeleton" class="px-5 lg:px-10 max-w-lg lg:mx-auto space-y-4 mt-4">
+    <div class="flex flex-col items-center gap-3"><div class="skeleton w-28 h-28 rounded-full"></div><div class="skeleton h-8 w-48 rounded-xl"></div></div>
+    <div class="skeleton h-16 w-full mt-6"></div>
+    <div class="skeleton h-16 w-full"></div>
+    <div class="skeleton h-16 w-full"></div>
+    <div class="skeleton h-16 w-full"></div>
+  </div>
+
+  <!-- Contenu -->
+  <div id="profil-content" class="hidden px-5 lg:px-10 max-w-lg lg:mx-auto mt-4">
+
+    <!-- Avatar + nom -->
+    <section class="flex flex-col items-center mb-8">
+      <div class="w-28 h-28 rounded-full overflow-hidden shadow-xl shadow-primary/10 border-4 border-surface-container-lowest bg-surface-container-high flex items-center justify-center mb-4">
+        <span id="avatar-icon" class="material-symbols-outlined text-6xl text-outline-variant" style="font-variation-settings:'FILL' 1">account_circle</span>
+      </div>
+      <h2 id="profil-nom" class="font-headline text-2xl lg:text-3xl text-primary font-bold">—</h2>
+      <p id="profil-email" class="text-on-surface-variant text-sm mt-1">—</p>
+    </section>
+
+    <!-- Menu actions -->
+    <section class="space-y-3 mb-8">
+      <a href="/modifier-profil-client" class="menu-item flex items-center justify-between p-5 bg-surface-container-low rounded-2xl hover:bg-surface-container transition-colors">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">person</span>
+          </div>
+          <span class="font-bold text-on-surface text-base">Modifier le profil</span>
+        </div>
+        <span class="material-symbols-outlined text-on-tertiary-container arrow">chevron_right</span>
+      </a>
+
+      <a href="/historique" class="menu-item flex items-center justify-between p-5 bg-surface-container-low rounded-2xl hover:bg-surface-container transition-colors">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">menu_book</span>
+          </div>
+          <span class="font-bold text-on-surface text-base">Historique recettes</span>
+        </div>
+        <span class="material-symbols-outlined text-on-tertiary-container arrow">chevron_right</span>
+      </a>
+
+      <a href="/favoris" class="menu-item flex items-center justify-between p-5 bg-surface-container-low rounded-2xl hover:bg-surface-container transition-colors">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">favorite</span>
+          </div>
+          <span class="font-bold text-on-surface text-base">Favoris</span>
+        </div>
+        <span class="material-symbols-outlined text-on-tertiary-container arrow">chevron_right</span>
+      </a>
+
+      <a href="/preferences" class="menu-item flex items-center justify-between p-5 bg-surface-container-low rounded-2xl hover:bg-surface-container transition-colors">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">settings</span>
+          </div>
+          <span class="font-bold text-on-surface text-base">Préférences</span>
+        </div>
+        <span class="material-symbols-outlined text-on-tertiary-container arrow">chevron_right</span>
+      </a>
+    </section>
+
+    <!-- Déconnexion -->
+    <div class="flex justify-center">
+      <button onclick="ouvrirModalDeconnexion()"
+        class="bg-primary text-on-primary px-12 py-4 rounded-full font-semibold text-sm uppercase tracking-widest shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">
+        Déconnexion
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- POPUP DÉCONNEXION -->
+<div id="modal-deconnexion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-6 bg-primary/40 backdrop-blur-sm">
+  <div class="bg-surface w-full max-w-[340px] rounded-3xl p-8 shadow-2xl text-center">
+    <h3 class="font-headline text-2xl text-primary font-bold mb-3">Déconnexion</h3>
+    <p class="text-on-surface-variant text-sm mb-8 leading-relaxed">Voulez-vous vraiment vous déconnecter ?</p>
+    <div class="flex flex-col gap-3">
+      <button onclick="fermerModalDeconnexion()" class="w-full py-4 rounded-full font-semibold text-primary bg-surface-container-low hover:bg-surface-container transition-colors text-sm">Annuler</button>
+      <button onclick="confirmerDeconnexion()" class="w-full py-4 rounded-full font-semibold text-sm bg-primary text-on-primary uppercase tracking-widest shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">Déconnexion</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { getProfil } from '../../controllers/clientController.js';
+import { handleLogout, protegerPage } from '../../controllers/authController.js';
+import { getCurrentUser } from '../../services/authService.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // const utilisateur = // await protegerPage('client'); // BYPASS TEST // BYPASS TEST
+  if (!utilisateur) return;
+  try {
+    const user = await getCurrentUser();
+    const clientId = user?.uid || 'client_anonymous';
+    const result = await getProfil(clientId);
+    document.getElementById('skeleton').classList.add('hidden');
+    document.getElementById('profil-content').classList.remove('hidden');
+    if (result.success && result.profil) {
+      const p = result.profil;
+      document.getElementById('profil-nom').textContent = p.nom || p.displayName || 'Utilisateur';
+      document.getElementById('profil-email').textContent = p.email || '';
+    }
+  } catch(e) {
+    console.error('[profil]', e);
+    document.getElementById('skeleton').classList.add('hidden');
+    document.getElementById('profil-content').classList.remove('hidden');
+  }
+});
+
+window.ouvrirModalDeconnexion = () => document.getElementById('modal-deconnexion').classList.remove('hidden');
+window.fermerModalDeconnexion = () => document.getElementById('modal-deconnexion').classList.add('hidden');
+window.confirmerDeconnexion = async () => {
+  try { await handleLogout(); } catch(e) {}
+  window.location.href = '/login';
+};
+</script>
+</body>
+</html>

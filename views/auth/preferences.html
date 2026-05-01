@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>EthnicEats - Choisissez vos préférences</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet"/>
+
+  <!-- Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind Config -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "secondary-fixed": "#ffdea5",
+            "on-secondary-container": "#785a1a",
+            "surface-tint": "#3f6653",
+            "secondary-container": "#fed488",
+            "inverse-surface": "#303030",
+            "tertiary-fixed": "#e6e2db",
+            "primary": "#012d1d",
+            "primary-fixed": "#c1ecd4",
+            "on-background": "#1b1c1c",
+            "tertiary-container": "#3e3c37",
+            "outline-variant": "#c1c8c2",
+            "surface-dim": "#dcd9d9",
+            "on-primary-fixed": "#002114",
+            "primary-fixed-dim": "#a5d0b9",
+            "on-tertiary-fixed-variant": "#484742",
+            "on-error": "#ffffff",
+            "surface-container": "#f0eded",
+            "background": "#fcf9f8",
+            "on-tertiary": "#ffffff",
+            "error-container": "#ffdad6",
+            "on-primary-container": "#86af99",
+            "tertiary-fixed-dim": "#cac6bf",
+            "secondary": "#775a19",
+            "surface-container-lowest": "#ffffff",
+            "on-tertiary-fixed": "#1d1c18",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed-variant": "#274e3d",
+            "on-secondary-fixed": "#261900",
+            "tertiary": "#282622",
+            "on-tertiary-container": "#aaa6a0",
+            "on-surface-variant": "#414844",
+            "inverse-on-surface": "#f3f0ef",
+            "primary-container": "#1b4332",
+            "surface-container-high": "#eae7e7",
+            "surface": "#fcf9f8",
+            "on-primary": "#ffffff",
+            "surface-container-highest": "#e5e2e1",
+            "error": "#ba1a1a",
+            "secondary-fixed-dim": "#e9c176",
+            "surface-bright": "#fcf9f8",
+            "surface-container-low": "#f6f3f2",
+            "on-secondary-fixed-variant": "#5d4201",
+            "inverse-primary": "#a5d0b9",
+            "outline": "#717973",
+            "on-error-container": "#93000a",
+            "surface-variant": "#e5e2e1",
+            "on-surface": "#1b1c1c"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          fontFamily: {
+            headline: ["Playfair Display", "serif"],
+            body: ["Manrope", "sans-serif"],
+            label: ["Manrope", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Manrope', sans-serif;
+      min-height: max(884px, 100dvh);
+    }
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+    }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #ffffff;
+      border-radius: 9999px;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen antialiased flex flex-col">
+
+  <!-- TopAppBar -->
+  <header class="flex items-center px-6 py-4 w-full backdrop-blur-md sticky top-0 z-50 bg-[#fcf9f8] dark:bg-stone-950/90 docked full-width relative">
+    <button
+      id="btn-retour"
+      aria-label="Retour"
+      class="scale-95 active:opacity-80 transition-all text-[#012d1d] dark:text-emerald-50 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-full p-2"
+    >
+      <span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+    </button>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex flex-col px-6 pt-8 pb-12 max-w-3xl mx-auto w-full lg:pt-0 lg:justify-center">
+
+    <!-- Heading -->
+    <div class="flex flex-col gap-3 mb-10">
+      <h2 class="font-body text-3xl md:text-4xl lg:text-5xl font-bold text-primary">
+        Choisissez vos préférences
+      </h2>
+      <p class="font-body text-sm md:text-base text-on-surface-variant">
+        Ces choix nous permettent de sélectionner les meilleurs ingrédients et sources pour vos recettes
+      </p>
+    </div>
+
+    <!-- Preferences Form -->
+    <div class="space-y-8">
+
+      <!-- Section 1: Source des produits -->
+      <section class="flex flex-col gap-3">
+        <h3 class="font-body text-base md:text-lg font-bold text-on-surface">
+          Source des produits
+        </h3>
+        <div class="flex flex-wrap gap-3" data-group="source">
+          <button
+            aria-pressed="true"
+            data-value="souk"
+            class="flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border-2 border-[#1B4332] text-[#1B4332] font-label text-sm md:text-base font-medium transition-all duration-300"
+            onclick="selectOption(this)"
+          >
+            <span>Souk / marchés locaux</span>
+            <div class="w-4 h-4 rounded-full bg-[#1B4332] text-white flex items-center justify-center">
+              <span class="material-symbols-outlined" style="font-size: 12px;">check</span>
+            </div>
+          </button>
+          <button
+            aria-pressed="false"
+            data-value="supermarche"
+            class="flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label text-sm md:text-base font-medium hover:bg-surface-container-low transition-all duration-300"
+            onclick="selectOption(this)"
+          >
+            <span>Supermarché</span>
+            <div class="w-4 h-4 rounded-full border border-outline-variant"></div>
+          </button>
+          <button
+            aria-pressed="false"
+            data-value="mix"
+            class="flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label text-sm md:text-base font-medium hover:bg-surface-container-low transition-all duration-300"
+            onclick="selectOption(this)"
+          >
+            <span>Mix des deux</span>
+            <div class="w-4 h-4 rounded-full border border-outline-variant"></div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Section 2: Budget -->
+      <section class="flex flex-col gap-3">
+        <h3 class="font-body text-base md:text-lg font-bold text-on-surface">
+          Budget
+        </h3>
+        <div class="flex flex-wrap gap-3" data-group="budget">
+          <button
+            aria-pressed="false"
+            data-value="faible"
+            class="flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label text-sm md:text-base font-medium hover:bg-surface-container-low transition-all duration-300"
+            onclick="selectOption(this)"
+          >
+            <span>Faible</span>
+            <div class="w-4 h-4 rounded-full border border-outline-variant"></div>
+          </button>
+          <button
+            aria-pressed="true"
+            data-value="moyen"
+            class="flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border-2 border-[#1B4332] text-[#1B4332] font-label text-sm md:text-base font-medium transition-all duration-300"
+            onclick="selectOption(this)"
+          >
+            <span>Moyen</span>
+            <div class="w-4 h-4 rounded-full bg-[#1B4332] text-white flex items-center justify-center">
+              <span class="material-symbols-outlined" style="font-size: 12px;">check</span>
+            </div>
+          </button>
+          <button
+            aria-pressed="false"
+            data-value="eleve"
+            class="flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label text-sm md:text-base font-medium hover:bg-surface-container-low transition-all duration-300"
+            onclick="selectOption(this)"
+          >
+            <span>Élevé</span>
+            <div class="w-4 h-4 rounded-full border border-outline-variant"></div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Section 3: Priorité -->
+      <section class="flex flex-col gap-3">
+        <h3 class="font-body text-base md:text-lg font-bold text-on-surface">
+          Priorité
+        </h3>
+        <div class="flex flex-wrap gap-3" data-group="priorite">
+          <button
+            aria-pressed="false"
+            data-value="moins_cher"
+            class="flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label text-sm md:text-base font-medium hover:bg-surface-container-low transition-all duration-300"
+            onclick="selectOption(this)"
+          >
+            <span>Le moins cher</span>
+            <div class="w-4 h-4 rounded-full border border-outline-variant"></div>
+          </button>
+          <button
+            aria-pressed="false"
+            data-value="plus_rapide"
+            class="flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label text-sm md:text-base font-medium hover:bg-surface-container-low transition-all duration-300"
+            onclick="selectOption(this)"
+          >
+            <span>Le plus rapide</span>
+            <div class="w-4 h-4 rounded-full border border-outline-variant"></div>
+          </button>
+          <button
+            aria-pressed="true"
+            data-value="plus_frais"
+            class="flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border-2 border-[#1B4332] text-[#1B4332] font-label text-sm md:text-base font-medium transition-all duration-300"
+            onclick="selectOption(this)"
+          >
+            <span>Le plus frais</span>
+            <div class="w-4 h-4 rounded-full bg-[#1B4332] text-white flex items-center justify-center">
+              <span class="material-symbols-outlined" style="font-size: 12px;">check</span>
+            </div>
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Error message -->
+    <p id="error-global" class="hidden mt-6 text-sm font-medium text-error font-label text-center"></p>
+
+    <!-- Bottom Action Area -->
+    <div class="mt-12 flex flex-col items-center gap-3 w-full">
+      <button
+        id="btn-continuer"
+        type="button"
+        class="w-full max-w-[400px] bg-gradient-to-b from-primary to-primary-container text-on-primary font-body font-bold text-lg md:text-xl py-3 rounded-full shadow-[0px_12px_32px_rgba(27,28,28,0.06)] active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        Continuer
+      </button>
+      <p class="text-center font-label text-sm md:text-base text-on-surface-variant max-w-[400px]">
+        Vous pourrez modifier ces préférences plus tard dans votre profil
+      </p>
+    </div>
+
+  </main>
+
+  <!-- Selection JS — kept exactly as in reference file -->
+  <script>
+    function selectOption(btn) {
+      const container = btn.closest('.flex.flex-wrap.gap-3');
+      const buttons = container.querySelectorAll('button');
+
+      buttons.forEach(b => {
+        b.setAttribute('aria-pressed', 'false');
+        b.className = 'flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-label text-sm md:text-base font-medium hover:bg-surface-container-low transition-all duration-300';
+        const div = b.querySelector('div.rounded-full');
+        if (div) {
+          div.className = 'w-4 h-4 rounded-full border border-outline-variant';
+          div.innerHTML = '';
+        }
+      });
+
+      btn.setAttribute('aria-pressed', 'true');
+      btn.className = 'flex items-center gap-3 py-2 px-4 rounded-lg bg-surface-container-lowest border-2 border-[#1B4332] text-[#1B4332] font-label text-sm md:text-base font-medium transition-all duration-300';
+      const activeDiv = btn.querySelector('div.rounded-full');
+      if (activeDiv) {
+        activeDiv.className = 'w-4 h-4 rounded-full bg-[#1B4332] text-white flex items-center justify-center';
+        activeDiv.innerHTML = '<span class="material-symbols-outlined" style="font-size: 12px;">check</span>';
+      }
+    }
+  </script>
+
+  <!-- Controller logic -->
+  <script type="module">
+    import { getCurrentUser }        from "../../controllers/authController.js";
+    import { sauvegarderPreferences } from "../../controllers/clientController.js";
+
+    // ── Budgets max en MAD par niveau ─────────────────────────────────────────
+    const BUDGET_MAX = {
+      faible: 100,
+      moyen:  300,
+      eleve:  1000,
+    };
+
+    // ── Éléments DOM ──────────────────────────────────────────────────────────
+    const btnRetour    = document.getElementById("btn-retour");
+    const btnContinuer = document.getElementById("btn-continuer");
+    const errorGlobal  = document.getElementById("error-global");
+
+    // ── Navigation retour ─────────────────────────────────────────────────────
+    btnRetour.addEventListener("click", () => {
+      window.location.href = "verification.html";
+    });
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function getValeurSelectionnee(group) {
+      const container = document.querySelector(`[data-group="${group}"]`);
+      const activeBtn = container.querySelector('button[aria-pressed="true"]');
+      return activeBtn ? activeBtn.dataset.value : null;
+    }
+
+    function activerSpinner() {
+      btnContinuer.disabled = true;
+      btnContinuer.innerHTML = `<span class="spinner"></span>Enregistrement…`;
+    }
+
+    function désactiverSpinner() {
+      btnContinuer.disabled = false;
+      btnContinuer.textContent = "Continuer";
+    }
+
+    function afficherErreur(msg) {
+      errorGlobal.textContent = msg;
+      errorGlobal.classList.remove("hidden");
+    }
+
+    function masquerErreur() {
+      errorGlobal.textContent = "";
+      errorGlobal.classList.add("hidden");
+    }
+
+    // ── Soumission ────────────────────────────────────────────────────────────
+    btnContinuer.addEventListener("click", async () => {
+      masquerErreur();
+
+      // 1. Récupérer l'utilisateur connecté
+      let utilisateur;
+      try {
+        utilisateur = await getCurrentUser();
+      } catch (err) {
+        afficherErreur("Impossible de vérifier votre session. Veuillez vous reconnecter.");
+        console.error("[preferences.html] getCurrentUser", err);
+        return;
+      }
+
+      if (!utilisateur) {
+        afficherErreur("Session expirée. Veuillez vous reconnecter.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      // 2. Lire les valeurs sélectionnées
+      const sourcePreferee = getValeurSelectionnee("source");
+      const budgetLabel    = getValeurSelectionnee("budget");
+      const priorite       = getValeurSelectionnee("priorite");
+
+      if (!sourcePreferee || !budgetLabel || !priorite) {
+        afficherErreur("Veuillez sélectionner une option dans chaque section.");
+        return;
+      }
+
+      const budgetMax = BUDGET_MAX[budgetLabel];
+
+      activerSpinner();
+
+      // 3. Sauvegarder via le contrôleur
+      try {
+        const résultat = await sauvegarderPreferences(utilisateur.uid, {
+          budgetMax,
+          sourcePreferee,
+          priorite,
+        });
+
+        if (résultat.success) {
+          window.location.href = "profil-client.html";
+        } else {
+          afficherErreur(résultat.message || "Une erreur est survenue. Veuillez réessayer.");
+          désactiverSpinner();
+        }
+
+      } catch (err) {
+        afficherErreur("Une erreur inattendue est survenue. Veuillez réessayer.");
+        console.error("[preferences.html] sauvegarderPreferences", err);
+        désactiverSpinner();
+      }
+    });
+  </script>
+
+</body>
+</html>

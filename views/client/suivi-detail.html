@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Suivi commande</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#012d1d", "on-primary": "#ffffff",
+          "primary-container": "#1b4332", "primary-fixed": "#c1ecd4",
+          "primary-fixed-dim": "#a5d0b9", "on-primary-fixed": "#002114",
+          "on-primary-fixed-variant": "#274e3d", "on-primary-container": "#86af99",
+          "inverse-primary": "#a5d0b9",
+          "secondary": "#775a19", "on-secondary": "#ffffff",
+          "secondary-container": "#fdd587", "on-secondary-container": "#785a19",
+          "secondary-fixed": "#ffdea3", "on-secondary-fixed": "#261900",
+          "surface": "#fbf9f8", "surface-dim": "#dbdad9", "surface-bright": "#fbf9f8",
+          "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f3",
+          "surface-container": "#efeded", "surface-container-high": "#e9e8e7",
+          "surface-container-highest": "#e3e2e2", "surface-variant": "#e3e2e2",
+          "on-surface": "#1b1c1c", "on-surface-variant": "#414844",
+          "background": "#fbf9f8", "on-background": "#1b1c1c",
+          "outline": "#717973", "outline-variant": "#c1c8c2",
+          "error": "#ba1a1a", "error-container": "#ffdad6",
+          "on-error": "#ffffff", "on-error-container": "#93000a",
+          "inverse-surface": "#303030", "inverse-on-surface": "#f2f0f0",
+          "tertiary": "#282622", "on-tertiary": "#ffffff",
+          "tertiary-container": "#3e3b37", "on-tertiary-container": "#aaa59f",
+          "surface-tint": "#3f6653",
+        },
+        borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+        fontFamily: { headline: ["Playfair Display", "serif"], body: ["Manrope", "sans-serif"] }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  body { font-family: 'Manrope', sans-serif; background: #fbf9f8; }
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+  .sidebar-item { color: #9ca3af; transition: all 0.2s; }
+  .sidebar-item:hover { color: #012d1d; background: rgba(1,45,29,0.05); border-radius: 1rem; }
+  .sidebar-item.active { color: #012d1d; font-weight: 700; background: rgba(1,45,29,0.07); border-radius: 1rem; }
+  .sidebar-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .skeleton { animation: pulse 1.5s ease-in-out infinite; background: #e5e2e1; border-radius: 0.75rem; }
+
+  /* Timeline */
+  .step-done   .step-dot { background: #012d1d; border-color: #012d1d; }
+  .step-done   .step-line { background: #012d1d; }
+  .step-active .step-dot { background: white; border-color: #012d1d; border-width: 4px; }
+  .step-active .step-line { background: #012d1d; }
+  .step-pending .step-dot { background: #e9e8e7; border-color: #e9e8e7; }
+  .step-pending .step-line { background: #e9e8e7; }
+  .step-pending .step-label { opacity: 0.45; }
+
+  /* Overlay popup */
+  .overlay { background: rgba(0,0,0,0.4); backdrop-filter: blur(6px); }
+
+  /* Pulse animation livreur arrivé */
+  @keyframes ringPulse {
+    0%   { transform: scale(1);   opacity: 0.8; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  .ring-pulse::before {
+    content: ''; position: absolute; inset: 0; border-radius: 9999px;
+    background: rgba(1,45,29,0.25);
+    animation: ringPulse 1.5s ease-out infinite;
+  }
+</style>
+</head>
+<body class="min-h-screen text-on-surface">
+
+<!-- ===== SIDEBAR DESKTOP ===== -->
+<nav class="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col items-start px-4 py-10 gap-2 z-40">
+  <div class="mb-8 px-2">
+    <h1 class="font-headline text-2xl text-primary font-bold">EthnicEats</h1>
+  </div>
+  <a href="/accueil" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">home</span>Accueil
+  </a>
+  <a href="/panier" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">shopping_bag</span>Panier
+  </a>
+  <a href="/suivi-commande" class="sidebar-item active flex items-center gap-3 w-full px-4 py-3 rounded-2xl">
+    <span class="material-symbols-outlined">local_shipping</span>Suivi
+  </a>
+  <a href="/profil-client" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">person</span>Profil
+  </a>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<main class="lg:ml-64 min-h-screen pb-12">
+
+  <!-- Header fixe -->
+  <header class="sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10 px-5 lg:px-10 h-16 flex items-center gap-4">
+    <a href="/suivi-commande" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary flex-shrink-0">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <h1 id="page-title" class="font-headline text-xl text-primary font-bold">Commande</h1>
+  </header>
+
+  <!-- Skeleton -->
+  <div id="skeleton" class="px-5 lg:px-10 pt-6 space-y-4 max-w-2xl lg:mx-auto">
+    <div class="skeleton h-32 w-full"></div>
+    <div class="skeleton h-28 w-full"></div>
+    <div class="skeleton h-64 w-full"></div>
+  </div>
+
+  <!-- Contenu -->
+  <div id="detail-content" class="hidden px-5 lg:px-10 pt-6 pb-10 max-w-2xl lg:mx-auto space-y-5">
+
+    <!-- ① Statut prominent -->
+    <section class="text-center py-8 bg-surface-container-low rounded-3xl border border-outline-variant/10">
+      <h2 id="statut-titre" class="font-headline text-3xl lg:text-4xl text-primary font-bold mb-2">—</h2>
+      <p id="temps-estime" class="text-on-surface-variant text-sm font-semibold">Temps estimé : —</p>
+    </section>
+
+    <!-- ② Infos livreur -->
+    <section id="section-livreur" class="bg-surface-container-lowest rounded-2xl border border-outline-variant/15 p-5 shadow-sm">
+      <!-- Avant assignation -->
+      <div id="livreur-attente" class="flex items-center gap-3 text-on-surface-variant">
+        <span class="material-symbols-outlined text-2xl opacity-50" style="font-variation-settings:'wght' 200">person_search</span>
+        <p class="text-sm">Aucun livreur assigné pour le moment...</p>
+      </div>
+      <!-- Après assignation -->
+      <div id="livreur-assigne" class="hidden flex-col gap-4">
+        <div>
+          <p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1">Votre livreur</p>
+          <p id="livreur-nom" class="font-bold text-on-surface text-lg"></p>
+          <p id="livreur-tel" class="text-on-surface-variant text-sm mt-0.5"></p>
+        </div>
+        <a id="btn-appeler" href="#"
+          class="flex items-center justify-center gap-2 bg-primary text-on-primary rounded-full py-3 font-semibold text-sm uppercase tracking-widest w-full hover:opacity-90 active:scale-[0.98] transition-all">
+          <span class="material-symbols-outlined text-[18px]">phone</span>
+          Appeler
+        </a>
+      </div>
+    </section>
+
+    <!-- ③ Timeline -->
+    <section class="bg-surface-container-lowest rounded-2xl border border-outline-variant/15 p-5 shadow-sm">
+      <h3 class="font-headline text-lg text-primary font-bold mb-5">Suivi en temps réel</h3>
+      <div id="timeline" class="space-y-0">
+        <!-- Généré par JS -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Erreur / intro -->
+  <div id="error-state" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+    <span class="material-symbols-outlined text-6xl text-outline mb-4" style="font-variation-settings:'wght' 200">error_outline</span>
+    <p class="text-on-surface-variant text-lg font-medium mb-4">Commande introuvable</p>
+    <a href="/suivi-commande" class="bg-primary text-on-primary rounded-full px-6 py-3 font-semibold text-sm">Retour au suivi</a>
+  </div>
+
+</main>
+
+<!-- ===== POPUP LIVREUR ARRIVÉ ===== -->
+<div id="popup-arrive" class="hidden fixed inset-0 z-50 overlay flex items-center justify-center px-6">
+  <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden">
+    <div class="h-32 bg-primary flex items-center justify-center relative overflow-hidden">
+      <div class="relative z-10 flex items-center justify-center">
+        <div class="relative w-16 h-16 ring-pulse">
+          <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl">
+            <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings:'FILL' 1">directions_bike</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="p-6 text-center">
+      <h3 class="font-headline text-xl text-primary font-bold mb-2">Livreur arrivé !</h3>
+      <p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Votre livreur est arrivé à votre adresse. Préparez-vous à réceptionner votre commande.</p>
+      <button onclick="fermerPopupArrive()"
+        class="w-full bg-primary text-on-primary rounded-full py-3.5 font-semibold text-sm uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all">
+        OK, j'arrive !
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { getDetailCommande, ecouterStatutCommande } from '../../controllers/commandeController.js';
+import { ecouterInfosLivreur, stopperEcoute as stopRT } from '../../services/realtimeService.js';
+
+const STATUTS_ORDRE = [
+  'commande_passee',
+  'confirmee',
+  'en_preparation',
+  'en_livraison',
+  'arrive',
+  'livree',
+];
+
+const STATUTS_LIBELLES = {
+  commande_passee: 'Commande passée',
+  confirmee:       'Confirmée',
+  en_preparation:  'En préparation',
+  en_livraison:    'En livraison',
+  arrive:          'Arrivé',
+  livree:          'Livrée',
+};
+
+let stopperEcoute = null;
+let commandeId = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  commandeId = params.get('id');
+  if (!commandeId) { showError(); return; }
+
+  document.getElementById('page-title').textContent = `Commande #${commandeId}`;
+  document.title = `EthnicEats — #${commandeId}`;
+
+  try {
+    const result = await getDetailCommande(commandeId);
+    document.getElementById('skeleton').classList.add('hidden');
+
+    if (!result.success || !result.commande) { showError(); return; }
+
+    const commande = result.commande;
+    renderDetail(commande);
+    document.getElementById('detail-content').classList.remove('hidden');
+
+    // Démarrer écoute temps réel
+    await demarrerEcoute(commandeId);
+
+  } catch(e) {
+    console.error('[suivi-detail]', e);
+    document.getElementById('skeleton').classList.add('hidden');
+    showError();
+  }
+});
+
+// ===== RENDER INITIAL =====
+function renderDetail(commande) {
+  updateStatut(commande.statut);
+  updateLivreur(commande);
+  renderTimeline(commande.statut);
+
+  // Temps estimé
+  const temps = commande.tempsEstime || '30–45 min';
+  document.getElementById('temps-estime').textContent = `Temps estimé : ${temps}`;
+}
+
+// ===== STATUT =====
+function updateStatut(statut) {
+  const libelle = STATUTS_LIBELLES[statut] || statut;
+  document.getElementById('statut-titre').textContent = libelle;
+}
+
+// ===== LIVREUR =====
+function updateLivreur(commande) {
+  const attente = document.getElementById('livreur-attente');
+  const assigne = document.getElementById('livreur-assigne');
+
+  if (commande.livreurNom && commande.livreurNom.trim()) {
+    attente.classList.add('hidden');
+    assigne.classList.remove('hidden');
+    assigne.classList.add('flex');
+    document.getElementById('livreur-nom').textContent = commande.livreurNom;
+    const tel = commande.livreurTelephone || '';
+    document.getElementById('livreur-tel').textContent = tel;
+    document.getElementById('btn-appeler').href = `tel:${tel}`;
+  } else {
+    attente.classList.remove('hidden');
+    assigne.classList.add('hidden');
+    assigne.classList.remove('flex');
+  }
+}
+
+// ===== TIMELINE =====
+function renderTimeline(statutActuel) {
+  const idx = STATUTS_ORDRE.indexOf(statutActuel);
+  const container = document.getElementById('timeline');
+  container.innerHTML = '';
+
+  STATUTS_ORDRE.forEach((statut, i) => {
+    const isDone   = i < idx;
+    const isActive = i === idx;
+    const isPending = i > idx;
+    const isLast   = i === STATUTS_ORDRE.length - 1;
+
+    const stepClass = isDone ? 'step-done' : isActive ? 'step-active' : 'step-pending';
+    const labelClass = isPending ? 'text-outline opacity-45' : isActive ? 'text-primary font-bold' : 'text-on-surface font-semibold';
+
+    const step = document.createElement('div');
+    step.id = `step-${statut}`;
+    step.className = `${stepClass} relative flex gap-4`;
+
+    step.innerHTML = `
+      <!-- Colonne gauche : dot + ligne -->
+      <div class="flex flex-col items-center flex-shrink-0 w-5">
+        <div class="step-dot w-4 h-4 rounded-full border-2 flex items-center justify-center z-10 flex-shrink-0 mt-0.5">
+          ${isDone ? `<span class="material-symbols-outlined text-[10px] text-on-primary" style="font-variation-settings:'FILL' 1,'wght' 700">check</span>` : ''}
+        </div>
+        ${!isLast ? `<div class="step-line w-0.5 flex-1 mt-1 min-h-[24px]"></div>` : ''}
+      </div>
+      <!-- Colonne droite : label -->
+      <div class="pb-6 flex-1 ${isLast ? 'pb-0' : ''}">
+        <p class="step-label ${labelClass} text-sm leading-tight">${STATUTS_LIBELLES[statut]}</p>
+      </div>
+    `;
+    container.appendChild(step);
+  });
+}
+
+// Met à jour la timeline sans recréer tout le DOM
+function updateTimeline(statutActuel) {
+  const idx = STATUTS_ORDRE.indexOf(statutActuel);
+  STATUTS_ORDRE.forEach((statut, i) => {
+    const step = document.getElementById(`step-${statut}`);
+    if (!step) return;
+    step.classList.remove('step-done', 'step-active', 'step-pending');
+    step.classList.add(i < idx ? 'step-done' : i === idx ? 'step-active' : 'step-pending');
+    const label = step.querySelector('.step-label');
+    if (label) {
+      label.className = `step-label text-sm leading-tight ${i < idx ? 'text-on-surface font-semibold' : i === idx ? 'text-primary font-bold' : 'text-outline opacity-45'}`;
+    }
+    // Icône check
+    const dot = step.querySelector('.step-dot');
+    if (dot) {
+      dot.innerHTML = i < idx
+        ? `<span class="material-symbols-outlined text-[10px] text-on-primary" style="font-variation-settings:'FILL' 1,'wght' 700">check</span>`
+        : '';
+    }
+  });
+}
+
+// ===== ÉCOUTE TEMPS RÉEL =====
+async function demarrerEcoute(id) {
+  try {
+    const res = await ecouterStatutCommande(
+      id,
+      async (statut, err) => {
+        if (err || !statut) return;
+        updateStatut(statut);
+        updateTimeline(statut);
+
+        // Recharger les infos livreur si confirmée + écoute temps réel
+        if (statut === 'confirmee') {
+          const r2 = await getDetailCommande(id);
+          if (r2.success && r2.commande) {
+            updateLivreur(r2.commande);
+            // Écoute temps réel des infos livreur
+            const livreurId = r2.commande.livreurId;
+            if (livreurId) {
+              ecouterInfosLivreur(livreurId, (infos) => {
+                if (infos) updateLivreur({ livreurNom: infos.nomComplet, livreurTelephone: infos.telephoneContact });
+              });
+            }
+          }
+        }
+      },
+      {
+        onArrive: () => {
+          document.getElementById('popup-arrive').classList.remove('hidden');
+        },
+        onLivree: () => {
+          // Rediriger vers suivi après 1.5s
+          setTimeout(() => { window.location.href = '/suivi-commande'; }, 1500);
+        }
+      }
+    );
+    if (res.success) stopperEcoute = res.stopperEcoute;
+  } catch(e) { console.error('[suivi-detail] écoute', e); }
+}
+
+// ===== POPUP ARRIVÉ =====
+window.fermerPopupArrive = function() {
+  document.getElementById('popup-arrive').classList.add('hidden');
+};
+
+function showError() {
+  document.getElementById('skeleton').classList.add('hidden');
+  document.getElementById('error-state').classList.remove('hidden');
+  document.getElementById('error-state').classList.add('flex');
+}
+
+// Nettoyage
+window.addEventListener('beforeunload', () => {
+  try { if (stopperEcoute) stopperEcoute(); } catch(e) {}
+});
+</script>
+</body>
+</html>

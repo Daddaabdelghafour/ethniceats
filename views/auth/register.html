@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>EthnicEats - Créer un compte</title>
+  <!-- Google Fonts: Manrope -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-surface": "#303030",
+            "secondary-fixed-dim": "#e9c176",
+            "on-primary-container": "#86af99",
+            "tertiary-fixed-dim": "#cac6bf",
+            "surface-container": "#f0eded",
+            "on-background": "#1b1c1c",
+            "error-container": "#ffdad6",
+            "on-secondary": "#ffffff",
+            "on-error-container": "#93000a",
+            "primary-fixed": "#c1ecd4",
+            "on-tertiary-container": "#aaa6a0",
+            "surface-bright": "#fcf9f8",
+            "secondary": "#775a19",
+            "error": "#ba1a1a",
+            "surface-container-highest": "#e5e2e1",
+            "primary-fixed-dim": "#a5d0b9",
+            "secondary-container": "#fed488",
+            "on-primary-fixed": "#002114",
+            "inverse-primary": "#a5d0b9",
+            "on-tertiary-fixed-variant": "#484742",
+            "on-secondary-fixed": "#261900",
+            "surface-variant": "#e5e2e1",
+            "tertiary": "#282622",
+            "on-error": "#ffffff",
+            "tertiary-container": "#3e3c37",
+            "surface-container-high": "#eae7e7",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed-variant": "#5d4201",
+            "tertiary-fixed": "#e6e2db",
+            "primary-container": "#1b4332",
+            "outline-variant": "#c1c8c2",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f6f3f2",
+            "on-secondary-container": "#785a1a",
+            "on-primary-fixed-variant": "#274e3d",
+            "secondary-fixed": "#ffdea5",
+            "outline": "#717973",
+            "inverse-on-surface": "#f3f0ef",
+            "background": "#fcf9f8",
+            "on-surface-variant": "#414844",
+            "surface-dim": "#dcd9d9",
+            "on-tertiary-fixed": "#1d1c18",
+            "surface-tint": "#3f6653",
+            "surface": "#fcf9f8",
+            "on-primary": "#ffffff",
+            "primary": "#012d1d",
+            "on-surface": "#1b1c1c"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Manrope", "sans-serif"],
+            "body": ["Manrope", "sans-serif"],
+            "label": ["Manrope", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: max(884px, 100dvh);
+    }
+
+    /* Spinner animation */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      display: inline-block;
+      width: 1.1rem;
+      height: 1.1rem;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 9999px;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.45rem;
+    }
+
+    /* Error message shake animation */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-4px); }
+      40%       { transform: translateX(4px); }
+      60%       { transform: translateX(-3px); }
+      80%       { transform: translateX(3px); }
+    }
+    .field-error {
+      font-size: 0.78rem;
+      color: #ba1a1a;
+      margin-top: 0.35rem;
+      margin-left: 0.25rem;
+      min-height: 1.1rem;
+      display: block;
+      animation: shake 0.35s ease;
+    }
+    .input-invalid {
+      ring: 1px solid #ba1a1a !important;
+      background-color: #fff8f8 !important;
+    }
+
+    /* Smooth slide for livreur field */
+    #champ-telephone {
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1),
+                  opacity 0.3s cubic-bezier(0.4,0,0.2,1);
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #champ-telephone.visible {
+      max-height: 110px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed">
+
+  <!-- TopAppBar -->
+  <header class="w-full top-0 sticky bg-surface z-50 flex items-center justify-between px-6 py-4 h-16">
+    <!-- Back arrow → choix-role.html -->
+    <button
+      id="btn-retour"
+      aria-label="Retour"
+      class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 flex items-center justify-center"
+    >
+    <a href="/">
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+    </a>
+    </button>
+
+    <!-- Brand -->
+    <h1 class="font-headline font-black tracking-tighter text-primary text-2xl absolute left-1/2 -translate-x-1/2">
+      EthnicEats
+    </h1>
+
+    <!-- Spacer -->
+    <div class="w-6"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex flex-col px-6 py-12 max-w-md mx-auto w-full justify-center pb-24">
+
+    <!-- Header -->
+    <div class="mb-10">
+      <h2 class="font-headline font-bold text-[2.5rem] leading-tight tracking-tight text-primary mb-3">
+        Créer un compte
+      </h2>
+      <p class="font-body text-lg text-on-surface-variant">
+        Rejoignez EthnicEats !
+      </p>
+    </div>
+
+    <!-- Register Form -->
+    <div class="flex flex-col gap-5">
+
+      <!-- Nom complet -->
+      <div class="flex flex-col">
+        <label class="font-label text-sm font-medium text-on-surface-variant mb-2 ml-1" for="nomComplet">
+          Nom complet
+        </label>
+        <input
+          class="w-full bg-surface-container-low text-on-surface px-5 py-4 rounded-md outline-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:bg-surface-container-high focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/40 font-body border-none"
+          id="nomComplet"
+          name="nomComplet"
+          placeholder="Jean Dupont"
+          type="text"
+          autocomplete="name"
+        />
+        <span class="field-error" id="err-nom" aria-live="polite"></span>
+      </div>
+
+      <!-- Email -->
+      <div class="flex flex-col">
+        <label class="font-label text-sm font-medium text-on-surface-variant mb-2 ml-1" for="email">
+          Adresse e-mail
+        </label>
+        <input
+          class="w-full bg-surface-container-low text-on-surface px-5 py-4 rounded-md outline-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:bg-surface-container-high focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/40 font-body border-none"
+          id="email"
+          name="email"
+          placeholder="nom@exemple.com"
+          type="email"
+          autocomplete="email"
+        />
+        <span class="field-error" id="err-email" aria-live="polite"></span>
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="flex flex-col">
+        <label class="font-label text-sm font-medium text-on-surface-variant mb-2 ml-1" for="motDePasse">
+          Mot de passe
+        </label>
+        <input
+          class="w-full bg-surface-container-low text-on-surface px-5 py-4 rounded-md outline-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:bg-surface-container-high focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/40 font-body border-none"
+          id="motDePasse"
+          name="motDePasse"
+          placeholder="••••••••"
+          type="password"
+          autocomplete="new-password"
+        />
+        <span class="field-error" id="err-mdp" aria-live="polite"></span>
+      </div>
+
+      <!-- Confirmation mot de passe -->
+      <div class="flex flex-col">
+        <label class="font-label text-sm font-medium text-on-surface-variant mb-2 ml-1" for="confirmMdp">
+          Confirmer le mot de passe
+        </label>
+        <input
+          class="w-full bg-surface-container-low text-on-surface px-5 py-4 rounded-md outline-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:bg-surface-container-high focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/40 font-body border-none"
+          id="confirmMdp"
+          name="confirmMdp"
+          placeholder="••••••••"
+          type="password"
+          autocomplete="new-password"
+        />
+        <span class="field-error" id="err-confirm" aria-live="polite"></span>
+      </div>
+
+      <!-- Numéro de contact (livreur uniquement) -->
+      <div class="flex flex-col" id="champ-telephone">
+        <label class="font-label text-sm font-medium text-on-surface-variant mb-2 ml-1" for="telephoneContact">
+          Numéro de contact
+          <span class="text-xs font-normal text-on-surface-variant/60 ml-1">(affiché aux clients lors des livraisons)</span>
+        </label>
+        <input
+          class="w-full bg-surface-container-low text-on-surface px-5 py-4 rounded-md outline-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:bg-surface-container-high focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/40 font-body border-none"
+          id="telephoneContact"
+          name="telephoneContact"
+          placeholder="+212 6XX XXX XXX"
+          type="tel"
+          autocomplete="tel"
+        />
+        <span class="field-error" id="err-tel" aria-live="polite"></span>
+      </div>
+
+      <!-- Global error message -->
+      <div
+        id="err-global"
+        class="hidden text-sm font-medium text-error bg-error-container rounded-lg px-4 py-3"
+        aria-live="polite"
+      ></div>
+
+      <!-- Submit Button -->
+      <div class="mt-6">
+        <button
+          id="btn-submit"
+          type="button"
+          class="w-full bg-gradient-to-b from-primary to-primary-container text-on-primary font-headline font-bold text-lg py-4 px-8 rounded-full shadow-[0px_12px_32px_rgba(27,28,28,0.06)] active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:opacity-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+        >
+          Créer un compte
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer link -->
+    <div class="mt-10 text-center">
+      <p class="font-body text-on-surface-variant">
+        Déjà un compte ?
+        <a
+          href="/login"
+          class="font-label font-bold text-primary ml-1 hover:text-secondary transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+        >
+          Se connecter
+        </a>
+      </p>
+    </div>
+
+  </main>
+
+  <script type="module">
+    import { handleRegister } from "../../controllers/authController.js";
+
+    // ── Rôle depuis localStorage ───────────────────────────────────────────────
+    const role = localStorage.getItem("roleChoisi") || "";
+
+    // ── Afficher le champ téléphone uniquement pour le livreur ────────────────
+    const champTel = document.getElementById("champ-telephone");
+    if (role === "livreur") {
+      champTel.classList.add("visible");
+    }
+
+    // ── Navigation ────────────────────────────────────────────────────────────
+    document.getElementById("btn-retour").addEventListener("click", () => {
+      window.location.href = "/";
+    });
+
+    // ── Helpers UI ────────────────────────────────────────────────────────────
+    function setError(id, message) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = message;
+        // Re-trigger animation on repeated error
+        el.style.animation = "none";
+        el.offsetHeight; // reflow
+        el.style.animation = "";
+      }
+    }
+
+    function clearError(id) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = "";
+    }
+
+    function clearAllErrors() {
+      ["err-nom", "err-email", "err-mdp", "err-confirm", "err-tel", "err-global"]
+        .forEach(clearError);
+      document.getElementById("err-global").classList.add("hidden");
+    }
+
+    function showGlobalError(message) {
+      const el = document.getElementById("err-global");
+      el.textContent = message;
+      el.classList.remove("hidden");
+    }
+
+    function setLoading(isLoading) {
+      const btn = document.getElementById("btn-submit");
+      if (isLoading) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>Création en cours…';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = "Créer un compte";
+      }
+    }
+
+    // ── Validation frontend ───────────────────────────────────────────────────
+    function validerFormulaire(nomComplet, email, motDePasse, confirmMdp, telephoneContact) {
+      let valide = true;
+      clearAllErrors();
+
+      // Nom complet
+      if (!nomComplet || nomComplet.trim().length < 2) {
+        setError("err-nom", "Le nom complet doit contenir au moins 2 caractères.");
+        valide = false;
+      }
+
+      // Email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        setError("err-email", "Veuillez saisir une adresse e-mail valide.");
+        valide = false;
+      }
+
+      // Mot de passe
+      if (!motDePasse || motDePasse.length < 6) {
+        setError("err-mdp", "Le mot de passe doit contenir au moins 6 caractères.");
+        valide = false;
+      }
+
+      // Confirmation
+      if (!confirmMdp || motDePasse !== confirmMdp) {
+        setError("err-confirm", "Les mots de passe ne correspondent pas.");
+        valide = false;
+      }
+
+      // Téléphone (obligatoire pour livreur)
+      if (role === "livreur") {
+        if (!telephoneContact || telephoneContact.trim().length < 6) {
+          setError("err-tel", "Le numéro de contact est obligatoire pour les livreurs.");
+          valide = false;
+        }
+      }
+
+      return valide;
+    }
+
+    // ── Soumission ────────────────────────────────────────────────────────────
+    document.getElementById("btn-submit").addEventListener("click", async () => {
+      const nomComplet        = document.getElementById("nomComplet").value.trim();
+      const email             = document.getElementById("email").value.trim();
+      const motDePasse        = document.getElementById("motDePasse").value;
+      const confirmMdp        = document.getElementById("confirmMdp").value;
+      const telephoneContact  = document.getElementById("telephoneContact").value.trim();
+
+      if (!validerFormulaire(nomComplet, email, motDePasse, confirmMdp, telephoneContact)) {
+        return;
+      }
+
+      setLoading(true);
+
+      const résultat = await handleRegister({
+        nomComplet,
+        email,
+        motDePasse,
+        confirmMdp,
+        role,
+        telephoneContact: role === "livreur" ? telephoneContact : null,
+      });
+
+      setLoading(false);
+
+      if (résultat.success) {
+        window.location.href = "/verification";
+      } else {
+        showGlobalError(résultat.message || "Une erreur est survenue. Veuillez réessayer.");
+      }
+    });
+
+    // ── Clear errors on input ─────────────────────────────────────────────────
+    document.getElementById("nomComplet").addEventListener("input",        () => clearError("err-nom"));
+    document.getElementById("email").addEventListener("input",             () => clearError("err-email"));
+    document.getElementById("motDePasse").addEventListener("input",        () => clearError("err-mdp"));
+    document.getElementById("confirmMdp").addEventListener("input",        () => clearError("err-confirm"));
+    document.getElementById("telephoneContact").addEventListener("input",  () => clearError("err-tel"));
+  </script>
+
+</body>
+</html>

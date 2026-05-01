@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>EthnicEats — Historique des livraisons</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#012d1d", "on-primary": "#ffffff", "primary-container": "#1b4332",
+            "primary-fixed": "#c1ecd4", "primary-fixed-dim": "#a5d0b9", "on-primary-fixed": "#002114",
+            "on-primary-fixed-variant": "#274e3d", "on-primary-container": "#86af99", "inverse-primary": "#a5d0b9",
+            "secondary": "#775a19", "on-secondary": "#ffffff", "secondary-container": "#fdd587",
+            "on-secondary-container": "#785a19", "secondary-fixed": "#ffdea3", "secondary-fixed-dim": "#e8c176",
+            "surface": "#fbf9f8", "surface-dim": "#dbdad9", "surface-bright": "#fbf9f8",
+            "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f3",
+            "surface-container": "#efeded", "surface-container-high": "#e9e8e7",
+            "surface-container-highest": "#e3e2e2", "surface-variant": "#e3e2e2",
+            "on-surface": "#1b1c1c", "on-surface-variant": "#414844",
+            "background": "#fbf9f8", "on-background": "#1b1c1c",
+            "outline": "#717973", "outline-variant": "#c1c8c2",
+            "error": "#ba1a1a", "on-error": "#ffffff",
+            "inverse-surface": "#303030", "tertiary": "#282622", "on-tertiary": "#ffffff",
+            "tertiary-container": "#3e3b37", "on-tertiary-container": "#aaa59f",
+          }, borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          fontFamily: { headline: ["Playfair Display", "serif"], body: ["Manrope", "sans-serif"] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Playfair Display', serif;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .4
+      }
+    }
+
+    .skeleton {
+      animation: pulse 1.5s ease-in-out infinite;
+      background: #e5e2e1;
+      border-radius: 0.75rem;
+    }
+
+    .bg-glass {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Expandable */
+    .order-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+
+    .hist-card.expanded .order-details {
+      max-height: 500px;
+    }
+  </style>
+</head>
+
+<body class="bg-background text-on-background min-h-screen">
+
+  <!-- Top bar -->
+  <header
+    class="sticky top-0 z-50 bg-surface/80 bg-glass border-b border-outline-variant/20 h-16 px-5 flex items-center gap-4 lg:justify-center relative">
+    <button onclick="history.back()"
+      class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center hover:bg-surface-container transition-colors active:scale-95 lg:absolute lg:left-5">
+      <span class="material-symbols-outlined text-primary">arrow_back</span>
+    </button>
+    <h1 class="font-headline text-[1.3rem] sm:text-2xl text-primary font-bold whitespace-nowrap">Historique des
+      livraisons</h1>
+  </header>
+
+  <main class="px-5 lg:px-10 max-w-2xl lg:mx-auto pt-6 pb-12">
+
+
+
+    <!-- Skeleton -->
+    <div id="skeleton" class="space-y-3">
+      <div class="skeleton h-24 w-full rounded-2xl"></div>
+      <div class="skeleton h-24 w-full rounded-2xl"></div>
+      <div class="skeleton h-24 w-full rounded-2xl"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-center">
+      <div class="w-20 h-20 mb-5 rounded-full bg-surface-container flex items-center justify-center">
+        <span class="material-symbols-outlined text-4xl text-on-surface-variant/40">history</span>
+      </div>
+      <h3 class="font-headline text-xl text-primary font-bold mb-2">Aucune livraison</h3>
+      <p class="text-on-surface-variant text-sm max-w-[220px] mx-auto">Vos livraisons terminées apparaîtront ici.</p>
+    </div>
+
+    <!-- Liste -->
+    <div id="historique-list" class="hidden flex-col gap-3"></div>
+  </main>
+
+  <script type="module">
+    import { getHistorique } from '../../controllers/livreurController.js';
+    import { getCurrentUser } from '../../services/authService.js';
+
+    let livreurId = 'livreur_anonymous';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const user = await getCurrentUser();
+        livreurId = user?.uid || null;
+      } catch (e) { }
+      await charger();
+    });
+
+    async function charger() {
+      try {
+        const hist = await getHistorique(livreurId);
+        document.getElementById('skeleton').classList.add('hidden');
+        if (!hist.length) { afficherVide(); return; }
+        afficherHistorique(hist);
+      } catch (e) {
+        console.error('[historique-livreur]', e);
+        document.getElementById('skeleton').classList.add('hidden');
+        afficherVide();
+      }
+    }
+
+    function afficherVide() {
+      document.getElementById('empty-state').classList.remove('hidden');
+      document.getElementById('empty-state').classList.add('flex');
+    }
+
+    function afficherHistorique(hist) {
+      const list = document.getElementById('historique-list');
+      list.classList.remove('hidden'); list.classList.add('flex');
+
+      // Trier du plus récent au plus ancien
+      hist.sort((a, b) => new Date(b.dateCreation) - new Date(a.dateCreation));
+
+      hist.forEach((cmd, idx) => list.appendChild(buildCard(cmd, idx)));
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+
+    function buildCard(cmd, idx) {
+      const id = `hc-${idx}`;
+      const nb = cmd.nbIngredients ?? cmd.panier?.length ?? 0;
+      const adr = `${cmd.adresseLivraison?.adresse || ''}, ${cmd.adresseLivraison?.ville || ''}`.replace(/^,\s*|,\s*$/, '');
+
+      const div = document.createElement('div');
+      div.className = 'hist-card bg-surface-container-lowest rounded-2xl border border-outline-variant/20 shadow-sm overflow-hidden';
+      div.id = id;
+      div.innerHTML = `
+    <div class="p-4 flex gap-4">
+      <div class="w-12 h-12 rounded-xl bg-primary-fixed/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <span class="material-symbols-outlined text-primary" style="font-size:22px;">local_shipping</span>
+      </div>
+      <div class="flex-1">
+        <div class="flex justify-between items-start mb-1">
+          <h3 class="font-bold text-sm text-primary uppercase tracking-wide">#${cmd.id}</h3>
+          <span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">Livrée</span>
+        </div>
+        <p class="text-xs text-on-surface-variant font-medium mb-0.5">${nb} ingrédient${nb > 1 ? 's' : ''} · ${cmd.adresseLivraison?.ville || '—'}</p>
+        <p class="text-[11px] text-outline mb-1.5">${fmtDate(cmd.dateCreation)}</p>
+        <p class="font-bold text-sm text-primary">${cmd.prixTotal} MAD</p>
+      </div>
+    </div>
+    <!-- Expandable details -->
+    <div class="order-details border-t border-outline-variant/10 bg-surface-container/30">
+      <div class="px-4 pb-4 pt-3 grid grid-cols-2 gap-y-3 gap-x-6">
+        <div>
+          <p class="text-[9px] font-bold text-outline uppercase tracking-wider mb-1">Paiement</p>
+          <p class="text-xs font-bold text-primary">${cmd.modePaiement === 'carte' ? 'En ligne' : 'À la livraison'}</p>
+        </div>
+        <div>
+          <p class="text-[9px] font-bold text-outline uppercase tracking-wider mb-1">Temps estimé</p>
+          <p class="text-xs font-bold text-primary">${cmd.tempsEstime ?? '—'} min</p>
+        </div>
+        <div class="col-span-2">
+          <p class="text-[9px] font-bold text-outline uppercase tracking-wider mb-1">Détail paiement</p>
+          <div class="space-y-0.5">
+            <div class="flex justify-between text-xs"><span class="text-on-surface-variant">Sous-total</span><span class="font-medium">${cmd.sousTotal ?? 0} MAD</span></div>
+            <div class="flex justify-between text-xs"><span class="text-on-surface-variant">Frais livraison</span><span class="font-medium">${cmd.fraisLivraison ?? 0} MAD</span></div>
+            <div class="flex justify-between text-xs pt-1 border-t border-outline-variant/20"><span class="font-bold">Total</span><span class="font-bold text-primary">${cmd.prixTotal} MAD</span></div>
+          </div>
+        </div>
+        <div class="col-span-2">
+          <p class="text-[9px] font-bold text-outline uppercase tracking-wider mb-1">Adresse livrée</p>
+          <p class="text-xs text-on-surface-variant leading-relaxed">${adr}</p>
+        </div>
+      </div>
+    </div>
+    <div class="px-4 py-3 flex items-center justify-end border-t border-outline-variant/10">
+      <button class="toggle-btn text-primary font-bold text-[10px] tracking-widest uppercase underline underline-offset-4 hover:opacity-70 transition-opacity" onclick="toggleCard('${id}')">
+        Voir détail
+      </button>
+    </div>`;
+
+      return div;
+    }
+
+    window.toggleCard = function (id) {
+      const card = document.getElementById(id);
+      const btn = card.querySelector('.toggle-btn');
+      const expanded = card.classList.toggle('expanded');
+      btn.textContent = expanded ? 'Réduire' : 'Voir détail';
+    };
+  </script>
+</body>
+
+</html>

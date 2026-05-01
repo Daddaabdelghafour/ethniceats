@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>EthnicEats - Choix du rôle</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary-fixed-dim": "#a5d0b9",
+            "on-error": "#ffffff",
+            "surface-bright": "#fcf9f8",
+            "secondary-fixed": "#ffdea5",
+            "surface-tint": "#3f6653",
+            "on-tertiary-container": "#aaa6a0",
+            "surface-container-low": "#f6f3f2",
+            "inverse-primary": "#a5d0b9",
+            "surface-container": "#f0eded",
+            "inverse-on-surface": "#f3f0ef",
+            "on-primary": "#ffffff",
+            "tertiary": "#282622",
+            "primary-container": "#1b4332",
+            "inverse-surface": "#303030",
+            "on-tertiary": "#ffffff",
+            "tertiary-fixed-dim": "#cac6bf",
+            "on-surface-variant": "#414844",
+            "on-secondary-container": "#785a1a",
+            "secondary-fixed-dim": "#e9c176",
+            "on-primary-fixed": "#002114",
+            "on-tertiary-fixed-variant": "#484742",
+            "secondary-container": "#fed488",
+            "outline": "#717973",
+            "on-tertiary-fixed": "#1d1c18",
+            "surface-container-highest": "#e5e2e1",
+            "error": "#ba1a1a",
+            "on-error-container": "#93000a",
+            "surface-dim": "#dcd9d9",
+            "background": "#fcf9f8",
+            "surface": "#fcf9f8",
+            "on-secondary-fixed": "#261900",
+            "tertiary-fixed": "#e6e2db",
+            "surface-container-lowest": "#ffffff",
+            "on-surface": "#1b1c1c",
+            "on-primary-fixed-variant": "#274e3d",
+            "surface-variant": "#e5e2e1",
+            "on-primary-container": "#86af99",
+            "outline-variant": "#c1c8c2",
+            "error-container": "#ffdad6",
+            "secondary": "#775a19",
+            "on-secondary": "#ffffff",
+            "on-secondary-fixed-variant": "#5d4201",
+            "tertiary-container": "#3e3c37",
+            "on-background": "#1b1c1c",
+            "surface-container-high": "#eae7e7",
+            "primary": "#012d1d",
+            "primary-fixed": "#c1ecd4"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Manrope"],
+            "body": ["Manrope"],
+            "label": ["Manrope"],
+            "playfair": ["Playfair Display", "serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Manrope', sans-serif;
+      min-height: max(884px, 100dvh);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+    }
+    .shadow-ambient {
+      box-shadow: 0px 12px 32px rgba(27, 28, 28, 0.06);
+    }
+  </style>
+</head>
+
+<body
+  class="text-on-surface min-h-screen flex flex-col antialiased relative bg-white"
+  x-data="{ selectedRole: 'client' }"
+  x-init="initChoixRole()"
+>
+
+  <!-- ========== FOND IMAGE ========== -->
+  <div class="fixed inset-0 w-full z-0 h-full">
+    <img
+      alt="Culinary Background"
+      class="w-full h-full object-cover"
+      src=../../images/home.png
+
+    />
+    <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-white"></div>
+  </div>
+
+  <!-- ========== HEADER ========== -->
+  <header class="absolute top-0 w-full z-50 bg-transparent">
+    <div class="flex justify-center items-center px-6 py-6 max-w-7xl mx-auto"></div>
+  </header>
+
+  <!-- ========== CONTENU PRINCIPAL ========== -->
+  <main class="flex-grow flex flex-col px-6 pt-32 max-w-lg mx-auto w-full relative z-10">
+
+    <!-- Titre et sous-titre -->
+    <div class="mb-12 text-center">
+      <h2 class="font-bold tracking-tight text-white mb-3 font-playfair leading-tight drop-shadow-lg text-5xl">
+        Bienvenue sur EthnicEats
+      </h2>
+      <p class="text-lg text-white/90 font-body font-medium leading-relaxed drop-shadow-md">
+        Choisissez votre rôle pour continuer
+      </p>
+    </div>
+
+    <!-- ===== CARTES DE RÔLE ===== -->
+    <div class="flex flex-col gap-6">
+
+      <!-- Carte Client -->
+      <label @click="selectedRole = 'client'" class="group relative cursor-pointer block">
+        <input class="sr-only" name="role" type="radio" value="client" x-model="selectedRole"/>
+        <div
+          :class="selectedRole === 'client'
+            ? 'bg-surface-container-low ring-2 ring-primary ring-inset'
+            : 'bg-surface-container-lowest'"
+          class="p-6 rounded-2xl transition-all duration-300 shadow-ambient overflow-hidden relative z-10"
+        >
+          <!-- Dégradé arrière-plan sélection -->
+          <div
+            :class="selectedRole === 'client' ? 'opacity-100' : 'opacity-0'"
+            class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent transition-opacity z-0"
+          ></div>
+
+          <div class="relative z-10 flex items-start gap-5">
+            <!-- Icône -->
+            <div
+              :class="selectedRole === 'client'
+                ? 'bg-primary text-on-primary scale-105'
+                : 'bg-surface-container-high text-primary'"
+              class="flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center shadow-sm transition-all duration-300"
+            >
+              <span
+                :style="selectedRole === 'client' ? 'font-variation-settings: \'FILL\' 1;' : ''"
+                class="material-symbols-outlined text-2xl"
+              >restaurant</span>
+            </div>
+
+            <!-- Texte -->
+            <div class="flex-grow">
+              <h3
+                :class="selectedRole === 'client' ? 'text-primary' : 'text-on-surface'"
+                class="text-xl font-bold mb-1 font-headline tracking-tight group-hover:text-primary transition-colors"
+              >Client</h3>
+              <p class="text-sm text-on-surface-variant font-body leading-relaxed">
+                Découvrez des recettes et faites-vous livrer les ingrédients
+              </p>
+            </div>
+
+            <!-- Radio indicator -->
+            <div class="flex-shrink-0 mt-1">
+              <span
+                :class="selectedRole === 'client' ? 'text-primary' : 'text-outline-variant'"
+                class="material-symbols-outlined transition-colors text-3xl"
+                x-text="selectedRole === 'client' ? 'radio_button_checked' : 'radio_button_unchecked'"
+              ></span>
+            </div>
+          </div>
+        </div>
+      </label>
+
+      <!-- Carte Livreur -->
+      <label @click="selectedRole = 'livreur'" class="group relative cursor-pointer block">
+        <input class="sr-only" name="role" type="radio" value="livreur" x-model="selectedRole"/>
+        <div
+          :class="selectedRole === 'livreur'
+            ? 'bg-surface-container-low ring-2 ring-primary ring-inset'
+            : 'bg-surface-container-lowest hover:shadow-lg'"
+          class="p-6 rounded-2xl transition-all duration-300 shadow-ambient overflow-hidden relative z-10"
+        >
+          <!-- Dégradé arrière-plan sélection -->
+          <div
+            :class="selectedRole === 'livreur' ? 'opacity-100' : 'opacity-0'"
+            class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent transition-opacity z-0"
+          ></div>
+
+          <div class="relative z-10 flex items-start gap-5">
+            <!-- Icône -->
+            <div
+              :class="selectedRole === 'livreur'
+                ? 'bg-primary text-on-primary scale-105'
+                : 'bg-surface-container-high text-primary group-hover:bg-surface-variant'"
+              class="flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center shadow-sm transition-all duration-300"
+            >
+              <span
+                :style="selectedRole === 'livreur' ? 'font-variation-settings: \'FILL\' 1;' : ''"
+                class="material-symbols-outlined text-2xl"
+              >two_wheeler</span>
+            </div>
+
+            <!-- Texte -->
+            <div class="flex-grow">
+              <h3
+                :class="selectedRole === 'livreur' ? 'text-primary' : 'text-on-surface'"
+                class="text-xl font-bold mb-1 font-headline tracking-tight group-hover:text-primary transition-colors"
+              >Livreur</h3>
+              <p class="text-sm text-on-surface-variant font-body leading-relaxed">
+                Acceptez des commandes et gérez vos livraisons
+              </p>
+            </div>
+
+            <!-- Radio indicator -->
+            <div class="flex-shrink-0 mt-1">
+              <span
+                :class="selectedRole === 'livreur' ? 'text-primary' : 'text-outline-variant'"
+                class="material-symbols-outlined transition-colors text-3xl"
+                x-text="selectedRole === 'livreur' ? 'radio_button_checked' : 'radio_button_unchecked'"
+              ></span>
+            </div>
+          </div>
+        </div>
+      </label>
+
+    </div><!-- fin cartes -->
+
+    <!-- ===== ZONE ACTIONS BAS ===== -->
+    <div class="mt-auto pt-12 pb-8 w-full z-40">
+
+      <!-- Bouton Continuer -->
+      <button
+        @click="continuer(selectedRole)"
+        class="w-full bg-gradient-to-b from-primary to-primary-container text-on-primary font-bold text-lg py-4 px-6 rounded-full shadow-ambient hover:opacity-90 active:scale-95 transition-all duration-300 font-headline tracking-wide flex justify-center items-center gap-2"
+      >
+        Continuer
+        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+      </button>
+
+      <!-- Lien inscription -->
+      <p class="text-center mt-5 text-sm font-body">
+        <span class="text-on-surface-variant">Pas encore de compte ?</span>
+        <a
+          href="/register"
+          class="ml-1 font-semibold text-primary underline underline-offset-2 hover:opacity-75 transition-opacity"
+        >S'inscrire</a>
+      </p>
+
+    </div>
+
+  </main><!-- fin main -->
+
+  <!-- ========== JAVASCRIPT (MVC — authController) ========== -->
+  <script>
+    /**
+     * Point d'entrée du contrôleur pour cet écran.
+     * authController.initChoixRole() sera appelé ici une fois l'architecture MVC en place.
+     * Pour l'instant, la logique est directement incluse ci-dessous.
+     */
+    function initChoixRole() {
+      // authController.initChoixRole() — à connecter lors de l'intégration MVC
+      console.log('[ChoixRole] Vue initialisée. Rôle par défaut : client');
+    }
+
+    /**
+     * Gère le clic sur "Continuer".
+     * 1. Sauvegarde le rôle choisi dans localStorage (clé : "roleChoisi")
+     * 2. Redirige vers login.html
+     *
+     * authController.handleContinuer(role) sera appelé ici lors de l'intégration MVC.
+     *
+     * @param {string} role - 'client' ou 'livreur'
+     */
+    function continuer(role) {
+      // authController.handleContinuer(role) — à connecter lors de l'intégration MVC
+
+      // Persistance du rôle choisi
+      localStorage.setItem('roleChoisi', role);
+      console.log('[ChoixRole] Rôle sauvegardé :', role);
+
+      // Redirection vers la page de connexion
+      window.location.href = '/login';
+    }
+  </script>
+
+</body>
+</html>

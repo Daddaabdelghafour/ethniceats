@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Cuisine asiatique</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#012d1d", "on-primary": "#ffffff",
+          "primary-container": "#1b4332", "on-primary-container": "#86af99",
+          "secondary": "#775a19", "on-secondary": "#ffffff",
+          "secondary-container": "#fed488", "on-secondary-container": "#785a1a",
+          "tertiary": "#282622", "on-tertiary": "#ffffff",
+          "tertiary-container": "#3e3c37", "on-tertiary-container": "#aaa6a0",
+          "background": "#fcf9f8", "on-background": "#1b1c1c",
+          "surface": "#fcf9f8", "on-surface": "#1b1c1c",
+          "surface-variant": "#e5e2e1", "on-surface-variant": "#414844",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f6f3f2",
+          "surface-container": "#f0eded",
+          "surface-container-high": "#eae7e7",
+          "surface-container-highest": "#e5e2e1",
+          "outline": "#717973", "outline-variant": "#c1c8c2",
+          "inverse-primary": "#a5d0b9",
+          "inverse-surface": "#303030", "inverse-on-surface": "#f3f0ef",
+          "error": "#ba1a1a", "on-error": "#ffffff",
+          "error-container": "#ffdad6", "on-error-container": "#93000a",
+          "surface-dim": "#dcd9d9", "surface-bright": "#fcf9f8",
+          "primary-fixed": "#c1ecd4", "primary-fixed-dim": "#a5d0b9",
+          "secondary-fixed": "#ffdea5", "secondary-fixed-dim": "#e9c176",
+          "surface-tint": "#3f6653",
+        },
+        borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+        fontFamily: {
+          headline: ["Playfair Display", "serif"],
+          display: ["Playfair Display", "serif"],
+          body: ["Manrope", "sans-serif"],
+          label: ["Manrope", "sans-serif"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  body { font-family: 'Manrope', sans-serif; overflow-x: hidden; }
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+  .recipe-card img { transition: transform 0.5s ease-out; }
+  .recipe-card:hover img { transform: scale(1.08); }
+  .pays-pill.active { background: #012d1d; color: #ffffff; }
+  .nav-item { color: #9ca3af; }
+  .nav-item.active { color: #012d1d; font-weight: 700; background: rgba(1,45,29,0.05); border-radius: 1rem; transform: scale(1.1); }
+  .nav-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  @media (min-width: 1024px) {
+    #bottom-nav { display: none; }
+    #sidebar-nav { display: flex; }
+  }
+  @media (max-width: 1023px) {
+    #sidebar-nav { display: none; }
+    #bottom-nav { display: flex; }
+  }
+</style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed overflow-x-hidden">
+
+<!-- Desktop Sidebar -->
+<nav id="sidebar-nav" class="fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col items-start px-4 py-10 gap-2 z-40">
+  <div class="mb-8 px-2">
+    <h1 class="font-headline text-2xl text-primary font-bold">EthnicEats</h1>
+  </div>
+  <a href="/accueil" class="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">home</span> Accueil
+  </a>
+  <a href="/panier" class="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">shopping_bag</span> Panier
+  </a>
+  <a href="/suivi-commande" class="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">local_shipping</span> Suivi
+  </a>
+  <a href="/profil-client" class="flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">person</span> Profil
+  </a>
+</nav>
+
+<main class="lg:ml-64 max-w-[1440px] pb-32">
+
+  <!-- Header -->
+  <section class="px-6 lg:px-12 pt-8 pb-3">
+    <a class="inline-flex items-center justify-center w-10 h-10 -ml-2 text-primary hover:bg-surface-container-low rounded-full transition-colors" href="/accueil">
+      <span class="material-symbols-outlined text-3xl">arrow_back</span>
+    </a>
+    <h1 class="font-display font-bold text-4xl lg:text-6xl tracking-tight text-primary mt-2">Cuisine asiatique</h1>
+  </section>
+
+  <!-- Search -->
+  <section class="px-6 lg:px-12 mb-8">
+    <div class="relative group max-w-2xl">
+      <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+        <span class="material-symbols-outlined text-outline">search</span>
+      </div>
+      <input id="search-input" class="w-full bg-surface-container-low border-none rounded-xl py-4 pl-12 pr-4 text-on-surface-variant placeholder:text-outline focus:ring-1 focus:ring-primary-container focus:bg-surface-container-high transition-all duration-300" placeholder="Rechercher une recette asiatique..." type="text"/>
+    </div>
+  </section>
+
+  <!-- Filtres par pays -->
+  <section class="mb-10 lg:px-12">
+    <div class="px-6 lg:px-0 mb-5">
+      <h2 class="font-label tracking-[0.2em] uppercase font-extrabold text-secondary text-[0.7rem]">Explorez par pays</h2>
+    </div>
+    <div class="flex overflow-x-auto no-scrollbar gap-6 px-6 lg:px-0">
+
+      <!-- Tous -->
+      <div class="flex flex-col items-center gap-3 flex-shrink-0 group cursor-pointer" onclick="filtrerPays('tous')">
+        <div class="pays-pill active w-16 h-16 rounded-full overflow-hidden flex items-center justify-center shadow-sm transition-all">
+          <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1">language</span>
+        </div>
+        <span class="text-xs font-bold text-on-surface group-hover:text-primary transition-colors">Tous</span>
+      </div>
+
+      <!-- Japon -->
+      <div class="flex flex-col items-center gap-3 flex-shrink-0 group cursor-pointer" onclick="filtrerPays('Japonais')">
+        <div class="w-16 h-16 rounded-full overflow-hidden bg-white shadow-sm">
+          <img alt="Japon" class="w-full h-full object-contain p-1.5" src="../../images/japonflag.png"/>
+        </div>
+        <span class="text-xs font-bold text-on-surface group-hover:text-primary transition-colors">Japon</span>
+      </div>
+
+      <!-- Chine -->
+      <div class="flex flex-col items-center gap-3 flex-shrink-0 group cursor-pointer" onclick="filtrerPays('Chinois')">
+        <div class="w-16 h-16 rounded-full overflow-hidden shadow-sm" style="background-color:#DE2910">
+          <img alt="Chine" class="w-full h-full object-contain p-1" src="../../images/chinaflag.png"/>
+        </div>
+        <span class="text-xs font-bold text-on-surface group-hover:text-primary transition-colors">Chine</span>
+      </div>
+
+      <!-- Corée -->
+      <div class="flex flex-col items-center gap-3 flex-shrink-0 group cursor-pointer" onclick="filtrerPays('Coréen')">
+        <div class="w-16 h-16 rounded-full overflow-hidden border border-outline-variant/20 shadow-sm">
+          <img alt="Corée" class="w-full h-full object-cover" src="../../images/koreaflag.png"/>
+        </div>
+        <span class="text-xs font-bold text-on-surface group-hover:text-primary transition-colors">Corée</span>
+      </div>
+
+      <!-- Vietnam -->
+      <div class="flex flex-col items-center gap-3 flex-shrink-0 group cursor-pointer" onclick="filtrerPays('Vietnamien')">
+        <div class="w-16 h-16 rounded-full overflow-hidden shadow-sm">
+          <img alt="Vietnam" class="w-full h-full object-cover" src="../../images/vietnamflag.png"/>
+        </div>
+        <span class="text-xs font-bold text-on-surface group-hover:text-primary transition-colors">Vietnam</span>
+      </div>
+
+      <!-- Inde -->
+      <div class="flex flex-col items-center gap-3 flex-shrink-0 group cursor-pointer" onclick="filtrerPays('Indien')">
+        <div class="w-16 h-16 rounded-full overflow-hidden shadow-sm">
+          <img alt="Inde" class="w-full h-full object-cover" src="../../images/indiaflag.png"/>
+        </div>
+        <span class="text-xs font-bold text-on-surface group-hover:text-primary transition-colors">Inde</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Recettes populaires par pays -->
+  <section class="lg:px-12 mb-6">
+    <div class="px-6 lg:px-0 flex justify-between items-end mb-6">
+      <h2 id="section-title" class="font-headline text-2xl lg:text-3xl text-primary-container">Plats asiatiques populaires</h2>
+    </div>
+    <div id="recettes-list" class="flex lg:grid lg:grid-cols-5 overflow-x-auto no-scrollbar gap-6 px-6 lg:px-0 snap-x snap-mandatory">
+      <!-- Skeleton -->
+      <div class="flex gap-6 animate-pulse">
+        <div class="flex-shrink-0 w-[85vw] lg:w-auto h-96 bg-surface-container rounded-xl"></div>
+        <div class="flex-shrink-0 w-[85vw] lg:w-auto h-96 bg-surface-container rounded-xl"></div>
+        <div class="flex-shrink-0 w-[85vw] lg:w-auto h-96 bg-surface-container rounded-xl"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toutes les autres recettes -->
+  <section class="px-6 lg:px-12">
+    <h2 id="autres-title" class="font-headline text-2xl text-primary mb-4">Autres recettes</h2>
+    <div id="autres-list" class="grid grid-cols-1 lg:grid-cols-2 gap-2"></div>
+    <div id="empty-state" class="hidden text-center py-16">
+      <span class="material-symbols-outlined text-5xl text-outline mb-3">search_off</span>
+      <p class="text-on-surface-variant">Aucune recette trouvée</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom Nav (mobile) -->
+<nav id="bottom-nav" class="fixed bottom-0 left-0 w-full z-50 justify-around items-center px-4 pb-8 pt-4 bg-[#fcf9f8]/90 backdrop-blur-2xl rounded-t-[2rem] shadow-[0_-12px_32px_rgba(27,28,28,0.04)] text-[11px] font-medium uppercase tracking-widest">
+  <a id="nav-accueil" class="nav-item flex flex-col items-center justify-center px-4 py-2 transition-all" href="/accueil">
+    <span class="material-symbols-outlined mb-1">home</span><span>Accueil</span>
+  </a>
+  <a id="nav-panier" class="nav-item flex flex-col items-center justify-center px-4 py-2 transition-all" href="/panier">
+    <span class="material-symbols-outlined mb-1">shopping_bag</span><span>Panier</span>
+  </a>
+  <a id="nav-suivi" class="nav-item flex flex-col items-center justify-center px-4 py-2 transition-all" href="/suivi-commande">
+    <span class="material-symbols-outlined mb-1">local_shipping</span><span>Suivi</span>
+  </a>
+  <a id="nav-profil" class="nav-item flex flex-col items-center justify-center px-4 py-2 transition-all" href="/profil-client">
+    <span class="material-symbols-outlined mb-1">person</span><span>Profil</span>
+  </a>
+</nav>
+
+<script type="module">
+import { protegerPage } from '../../controllers/authController.js';
+import { getRecettesParCategorie, getRecettesParSousCategorie } from '../../controllers/recetteController.js';
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+// const utilisateur = await protegerPage('client');
+// if (!utilisateur) throw new Error('Redirection');
+const utilisateur = { nomComplet: 'vous' };
+
+// ─── Labels des pays → sousCategorie dans recettes.js ─────────────────────────
+const PAYS_LABELS = {
+  'Japonais': 'Japon', 'Chinois': 'Chine',
+  'Coréen': 'Corée', 'Vietnamien': 'Vietnam', 'Indien': 'Inde'
+};
+
+// ─── Charger toutes les recettes asiatiques ───────────────────────────────────
+let toutesRecettes = await getRecettesParCategorie('asiatique');
+let payActif = 'tous';
+
+// ─── Afficher recettes populaires ─────────────────────────────────────────────
+function afficherPopulaires(recettes) {
+  const container = document.getElementById('recettes-list');
+  const populaires = recettes.filter(r => r.populaire);
+  container.innerHTML = '';
+
+  if (!populaires.length) {
+    container.innerHTML = '<p class="text-on-surface-variant px-6 py-8">Aucun plat populaire trouvé.</p>';
+    return;
+  }
+
+  populaires.forEach(r => {
+    const sousCat = r.sousCategorie || '';
+    const labelPays = PAYS_LABELS[sousCat] || sousCat;
+    const article = document.createElement('article');
+    article.className = 'recipe-card flex-shrink-0 w-[85vw] lg:w-auto snap-center flex flex-col h-full group cursor-pointer';
+    article.onclick = () => window.location.href = `/recette-detail?id=${r.id}`;
+    article.innerHTML = `
+      <div class="relative rounded-xl overflow-hidden mb-4 aspect-[4/5]">
+        <img class="w-full h-full object-cover" referrerpolicy="no-referrer" loading="lazy" decoding="async" src="${r.image || ''}" alt="${r.titre}"/>
+        <div class="absolute top-4 left-4">
+          <span class="bg-primary text-on-primary px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">${labelPays}</span>
+        </div>
+      </div>
+      <div class="space-y-2 flex-grow">
+        <h3 class="font-headline text-xl text-primary-container">${r.titre}</h3>
+        <p class="text-on-surface-variant text-sm leading-relaxed line-clamp-2">${r.descriptionCourte || r.description || ''}</p>
+      </div>
+    `;
+    container.appendChild(article);
+  });
+}
+
+// ─── Afficher autres recettes ─────────────────────────────────────────────────
+function afficherAutres(recettes) {
+  const autres = recettes.filter(r => !r.populaire);
+  const container = document.getElementById('autres-list');
+  const emptyState = document.getElementById('empty-state');
+  container.innerHTML = '';
+
+  if (!autres.length && !recettes.filter(r => r.populaire).length) {
+    emptyState.classList.remove('hidden');
+    return;
+  }
+  emptyState.classList.add('hidden');
+
+  if (!autres.length) {
+    document.getElementById('autres-title').classList.add('hidden');
+    return;
+  }
+  document.getElementById('autres-title').classList.remove('hidden');
+
+  autres.forEach(r => {
+    const sousCat = r.sousCategorie || '';
+    const labelPays = PAYS_LABELS[sousCat] || sousCat;
+    const item = document.createElement('div');
+    item.className = 'flex gap-4 items-start p-2 -ml-2 rounded-3xl hover:bg-surface-container-low transition-all duration-300 cursor-pointer';
+    item.onclick = () => window.location.href = `/recette-detail?id=${r.id}`;
+    item.innerHTML = `
+      <div class="w-20 h-20 flex-shrink-0 rounded-2xl overflow-hidden bg-surface-container shadow-sm">
+        <img class="w-full h-full object-cover" referrerpolicy="no-referrer" loading="lazy" decoding="async" src="${r.image || ''}" alt="${r.titre}"/>
+      </div>
+      <div class="flex flex-col pt-0.5 flex-1">
+        <div class="flex items-center gap-2 mb-0.5">
+          <span class="text-[10px] font-bold text-secondary uppercase tracking-widest">${labelPays}</span>
+        </div>
+        <h4 class="font-headline font-bold text-lg text-primary mb-0.5">${r.titre}</h4>
+        <p class="text-on-surface-variant text-xs leading-relaxed line-clamp-2">${r.descriptionCourte || r.description || ''}</p>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function afficherTout(recettes) {
+  afficherPopulaires(recettes);
+  afficherAutres(recettes);
+}
+
+afficherTout(toutesRecettes);
+
+// ─── Filtre par pays ──────────────────────────────────────────────────────────
+window.filtrerPays = function(pays) {
+  payActif = pays;
+
+  // Mettre à jour le titre
+  const titre = document.getElementById('section-title');
+  titre.textContent = pays === 'tous'
+    ? 'Plats asiatiques populaires'
+    : `Cuisine ${pays.toLowerCase()}`;
+
+  // Filtrer
+  const filtered = pays === 'tous'
+    ? toutesRecettes
+    : toutesRecettes.filter(r => r.sousCategorie === pays);
+
+  afficherTout(filtered);
+
+  // Style actif sur le bouton pays
+  document.querySelectorAll('.pays-pill').forEach(el => {
+    el.classList.remove('active');
+    el.style.background = '';
+    el.style.color = '';
+  });
+};
+
+// ─── Recherche ────────────────────────────────────────────────────────────────
+let searchTimeout;
+document.getElementById('search-input').addEventListener('input', e => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    const q = e.target.value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const source = payActif === 'tous' ? toutesRecettes : toutesRecettes.filter(r => r.sousCategorie === payActif);
+
+    if (!q) { afficherTout(source); return; }
+
+    const filtered = source.filter(r => {
+      const titre = r.titre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      return titre.includes(q) || (r.ingredients || []).some(i =>
+        i.nom.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q)
+      );
+    });
+    afficherTout(filtered);
+  }, 200);
+});
+</script>
+</body>
+</html>

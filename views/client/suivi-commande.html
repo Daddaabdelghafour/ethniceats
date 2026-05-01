@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Suivi des commandes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#012d1d", "on-primary": "#ffffff",
+          "primary-container": "#1b4332", "primary-fixed": "#c1ecd4",
+          "primary-fixed-dim": "#a5d0b9", "on-primary-fixed": "#002114",
+          "on-primary-fixed-variant": "#274e3d", "on-primary-container": "#86af99",
+          "inverse-primary": "#a5d0b9",
+          "secondary": "#775a19", "on-secondary": "#ffffff",
+          "secondary-container": "#fdd587", "on-secondary-container": "#785a19",
+          "secondary-fixed": "#ffdea3", "on-secondary-fixed": "#261900",
+          "surface": "#fbf9f8", "surface-dim": "#dbdad9", "surface-bright": "#fbf9f8",
+          "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f3",
+          "surface-container": "#efeded", "surface-container-high": "#e9e8e7",
+          "surface-container-highest": "#e3e2e2", "surface-variant": "#e3e2e2",
+          "on-surface": "#1b1c1c", "on-surface-variant": "#414844",
+          "background": "#fbf9f8", "on-background": "#1b1c1c",
+          "outline": "#717973", "outline-variant": "#c1c8c2",
+          "error": "#ba1a1a", "error-container": "#ffdad6",
+          "on-error": "#ffffff", "on-error-container": "#93000a",
+          "inverse-surface": "#303030", "inverse-on-surface": "#f2f0f0",
+          "tertiary": "#282622", "on-tertiary": "#ffffff",
+          "tertiary-container": "#3e3b37", "on-tertiary-container": "#aaa59f",
+          "surface-tint": "#3f6653",
+        },
+        borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+        fontFamily: { headline: ["Playfair Display", "serif"], body: ["Manrope", "sans-serif"] }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  body { font-family: 'Manrope', sans-serif; background: #fbf9f8; }
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+  .sidebar-item { color: #9ca3af; transition: all 0.2s; }
+  .sidebar-item:hover { color: #012d1d; background: rgba(1,45,29,0.05); border-radius: 1rem; }
+  .sidebar-item.active { color: #012d1d; font-weight: 700; background: rgba(1,45,29,0.07); border-radius: 1rem; }
+  .sidebar-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .skeleton { animation: pulse 1.5s ease-in-out infinite; background: #e5e2e1; border-radius: 0.75rem; }
+
+  @keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .order-card { animation: slideIn 0.25s ease-out both; }
+
+  /* Badge statuts */
+  .badge-commande_passee  { background: #e8f5e9; color: #1b5e20; }
+  .badge-confirmee        { background: #e3f2fd; color: #0d47a1; }
+  .badge-en_preparation   { background: #fff8e1; color: #e65100; }
+  .badge-en_livraison     { background: #fce4ec; color: #880e4f; }
+  .badge-arrive           { background: #f3e5f5; color: #4a148c; }
+  .badge-livree           { background: #e8f5e9; color: #1b5e20; }
+</style>
+</head>
+<body class="min-h-screen text-on-surface">
+
+<!-- ===== SIDEBAR DESKTOP ===== -->
+<nav class="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col items-start px-4 py-10 gap-2 z-40">
+  <div class="mb-8 px-2">
+    <h1 class="font-headline text-2xl text-primary font-bold">EthnicEats</h1>
+  </div>
+  <a href="/accueil" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">home</span>Accueil
+  </a>
+  <a href="/panier" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">shopping_bag</span>Panier
+  </a>
+  <a href="/suivi-commande" class="sidebar-item active flex items-center gap-3 w-full px-4 py-3 rounded-2xl">
+    <span class="material-symbols-outlined">local_shipping</span>Suivi
+  </a>
+  <a href="/profil-client" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">person</span>Profil
+  </a>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<main class="lg:ml-64 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="px-5 lg:px-10 pt-8 pb-4 lg:pt-10 lg:pb-6">
+    <h1 class="font-headline text-3xl lg:text-4xl text-primary font-bold lg:text-center">Suivi des commandes</h1>
+  </header>
+
+  <!-- Skeleton -->
+  <div id="skeleton" class="px-5 lg:px-10 space-y-4 max-w-2xl lg:mx-auto w-full">
+    <div class="skeleton h-44 w-full"></div>
+    <div class="skeleton h-44 w-full"></div>
+  </div>
+
+  <!-- État VIDE -->
+  <div id="empty-state" class="hidden flex-1 flex flex-col items-center justify-center text-center px-6 -mt-8 lg:-mt-16">
+    <div class="relative mb-8">
+      <div class="absolute inset-0 scale-150 bg-primary/5 rounded-full blur-3xl"></div>
+      <div class="relative w-48 h-48 lg:w-64 lg:h-64 bg-surface-container-lowest rounded-full shadow-xl flex items-center justify-center">
+        <div class="w-32 h-32 lg:w-44 lg:h-44 bg-primary/5 rounded-full flex items-center justify-center border border-primary/5">
+          <span class="material-symbols-outlined text-primary text-7xl lg:text-8xl opacity-60" style="font-variation-settings:'wght' 200">local_shipping</span>
+        </div>
+      </div>
+    </div>
+    <div class="max-w-xs lg:max-w-md space-y-3">
+      <h2 class="font-headline text-xl lg:text-2xl text-primary font-bold">Aucune commande en cours</h2>
+      <p class="text-on-surface-variant text-sm lg:text-base leading-relaxed">Vos commandes apparaîtront ici après validation</p>
+    </div>
+  </div>
+
+  <!-- État REMPLI -->
+  <div id="filled-state" class="hidden px-5 lg:px-10 pb-10 flex-col gap-4 max-w-2xl lg:mx-auto w-full">
+    <!-- Cartes générées par JS -->
+  </div>
+
+</main>
+
+<script type="module">
+import { getCommandesEnCours, ecouterStatutCommande } from '../../controllers/commandeController.js';
+import { getCurrentUser } from '../../services/authService.js';
+
+const LIBELLES = {
+  commande_passee: 'Commande passée',
+  confirmee: 'Confirmée',
+  en_preparation: 'En préparation',
+  en_livraison: 'En livraison',
+  arrive: 'Arrivé',
+  livree: 'Livrée',
+};
+
+let stoppers = {}; // commandeId → stopperEcoute()
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await charger();
+});
+
+async function charger() {
+  document.getElementById('skeleton').classList.remove('hidden');
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('filled-state').classList.add('hidden');
+
+  try {
+    let clientId = 'client_anonymous';
+    try { const u = await getCurrentUser(); if (u?.uid) clientId = u.uid; } catch(e) {}
+
+    const result = await getCommandesEnCours(clientId);
+    document.getElementById('skeleton').classList.add('hidden');
+
+    if (!result.success || result.commandes.length === 0) {
+      afficherVide();
+      return;
+    }
+
+    afficherCommandes(result.commandes);
+    // Écoute temps réel pour chaque commande
+    result.commandes.forEach(c => demarrerEcoute(c.id));
+
+  } catch (e) {
+    console.error('[suivi]', e);
+    document.getElementById('skeleton').classList.add('hidden');
+    afficherVide();
+  }
+}
+
+function afficherVide() {
+  document.getElementById('empty-state').classList.remove('hidden');
+  document.getElementById('empty-state').classList.add('flex');
+}
+
+function afficherCommandes(commandes) {
+  const container = document.getElementById('filled-state');
+  container.innerHTML = '';
+  commandes.forEach((c, i) => {
+    const el = creerCarteCommande(c, i);
+    container.appendChild(el);
+  });
+  container.classList.remove('hidden');
+  container.classList.add('flex');
+}
+
+function creerCarteCommande(c, idx) {
+  const div = document.createElement('div');
+  div.id = `card-${c.id}`;
+  div.className = 'order-card bg-surface-container-lowest border border-outline-variant/15 rounded-2xl p-5 shadow-sm flex flex-col gap-4';
+  div.style.animationDelay = `${idx * 60}ms`;
+  div.innerHTML = _htmlCarte(c);
+  return div;
+}
+
+function _htmlCarte(c) {
+  const libelle = LIBELLES[c.statut] || c.statut;
+  const nbIng = c.nbIngredients || (c.panier?.length ?? 0);
+  const recette = c.recetteTitre || '';
+  const temps = c.tempsEstime || '30–45 min';
+
+  return `
+    <!-- En-tête ID + badge -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-primary/8 flex items-center justify-center flex-shrink-0">
+          <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings:'wght' 300">receipt_long</span>
+        </div>
+        <span class="font-bold text-primary text-base tracking-tight">#${c.id}</span>
+      </div>
+      <span id="badge-${c.id}" class="badge-${c.statut} text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+        ${libelle}
+      </span>
+    </div>
+
+    <!-- Résumé -->
+    <div class="space-y-3">
+      <div>
+        <p class="font-bold text-on-surface text-sm">${nbIng} ingrédient${nbIng > 1 ? 's' : ''}${recette ? `, ${recette}` : ''}</p>
+        <div class="flex items-center gap-1.5 mt-1">
+          <span class="material-symbols-outlined text-secondary text-[18px]" style="font-variation-settings:'wght' 300">restaurant</span>
+          <span id="statut-label-${c.id}" class="text-secondary font-semibold text-sm">${libelle}</span>
+        </div>
+      </div>
+      <!-- Temps estimé -->
+      <div class="bg-surface-container-low rounded-xl p-3.5 flex items-center justify-between border border-outline-variant/10">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-on-surface-variant text-xl" style="font-variation-settings:'wght' 300">schedule</span>
+          <span class="text-on-surface text-sm">Temps estimé</span>
+        </div>
+        <span class="font-bold text-primary text-sm">${temps} min</span>
+      </div>
+    </div>
+
+    <!-- Bouton -->
+    <a href="/suivi-detail?id=${c.id}"
+      class="w-full bg-primary text-on-primary rounded-full py-3.5 font-semibold text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-md">
+      <span>Suivre ma commande</span>
+      <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+    </a>
+  `;
+}
+
+// Écoute temps réel — met à jour le badge et le label statut
+async function demarrerEcoute(commandeId) {
+  try {
+    const res = await ecouterStatutCommande(
+      commandeId,
+      (statut, err) => {
+        if (err || !statut) return;
+        // Mettre à jour badge
+        const badge = document.getElementById(`badge-${commandeId}`);
+        const label = document.getElementById(`statut-label-${commandeId}`);
+        if (badge) {
+          badge.className = `badge-${statut} text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full`;
+          badge.textContent = LIBELLES[statut] || statut;
+        }
+        if (label) label.textContent = LIBELLES[statut] || statut;
+      },
+      {
+        onConfirmee: (id) => {
+          // Mettre à jour le label pour indiquer qu'un livreur est assigné
+          const label = document.getElementById(`statut-label-${id}`);
+          if (label) {
+            label.textContent = 'Livreur assigné — En route !';
+            label.style.color = '#012d1d';
+          }
+        },
+        onArrive: (id) => {
+          // Mettre à jour le label pour indiquer que le livreur est arrivé
+          const label = document.getElementById(`statut-label-${id}`);
+          if (label) {
+            label.textContent = '🛵 Livreur arrivé !';
+            label.style.color = '#775a19';
+          }
+        },
+        onLivree: (id) => {
+          // Supprimer la carte
+          const card = document.getElementById(`card-${id}`);
+          if (card) card.remove();
+          // Si plus aucune carte → état vide
+          const filled = document.getElementById('filled-state');
+          if (!filled.children.length) {
+            filled.classList.add('hidden');
+            filled.classList.remove('flex');
+            afficherVide();
+          }
+        }
+      }
+    );
+    if (res.success) stoppers[commandeId] = res.stopperEcoute;
+  } catch(e) { console.error('[suivi] écoute', e); }
+}
+
+// Nettoyage
+window.addEventListener('beforeunload', () => {
+  Object.values(stoppers).forEach(stop => { try { stop(); } catch(e){} });
+});
+</script>
+</body>
+</html>

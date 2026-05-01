@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Accueil</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "inverse-primary": "#a5d0b9",
+          "error": "#ba1a1a",
+          "surface-container-high": "#eae7e7",
+          "primary-container": "#1b4332",
+          "primary": "#012d1d",
+          "surface-container-low": "#f6f3f2",
+          "tertiary": "#282622",
+          "error-container": "#ffdad6",
+          "surface-container-lowest": "#ffffff",
+          "surface": "#fcf9f8",
+          "on-primary-container": "#86af99",
+          "secondary-container": "#fed488",
+          "outline-variant": "#c1c8c2",
+          "on-error-container": "#93000a",
+          "background": "#fcf9f8",
+          "on-background": "#1b1c1c",
+          "on-tertiary": "#ffffff",
+          "on-secondary": "#ffffff",
+          "tertiary-container": "#3e3c37",
+          "surface-container": "#f0eded",
+          "on-surface-variant": "#414844",
+          "outline": "#717973",
+          "on-primary": "#ffffff",
+          "secondary": "#775a19",
+          "on-secondary-container": "#785a1a",
+          "surface-bright": "#fcf9f8",
+          "primary-fixed-dim": "#a5d0b9",
+          "inverse-surface": "#303030",
+          "on-surface": "#1b1c1c",
+          "inverse-on-surface": "#f3f0ef",
+          "primary-fixed": "#c1ecd4",
+          "on-error": "#ffffff",
+          "surface-container-highest": "#e5e2e1",
+          "surface-tint": "#3f6653",
+          "surface-variant": "#e5e2e1",
+          "surface-dim": "#dcd9d9",
+          "secondary-fixed": "#ffdea5",
+          "secondary-fixed-dim": "#e9c176",
+        },
+        borderRadius: {
+          DEFAULT: "0.25rem",
+          lg: "0.5rem",
+          xl: "0.75rem",
+          full: "9999px"
+        },
+        fontFamily: {
+          headline: ["Playfair Display", "serif"],
+          display: ["Manrope", "sans-serif"],
+          body: ["Manrope", "sans-serif"],
+          label: ["Manrope", "sans-serif"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body { font-family: 'Manrope', sans-serif; }
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+  .nav-item { color: #9ca3af; }
+  .nav-item.active { color: #012d1d; font-weight: 700; background: rgba(1,45,29,0.05); border-radius: 1rem; transform: scale(1.1); }
+  .nav-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .category-card img { transition: transform 0.7s ease; }
+  .category-card:hover img { transform: scale(1.05); }
+  #search-input:focus { outline: none; box-shadow: 0 0 0 2px rgba(1,45,29,0.15); }
+  /* Desktop sidebar nav */
+  @media (min-width: 1024px) {
+    #bottom-nav { display: none; }
+    #sidebar-nav { display: flex; }
+  }
+  @media (max-width: 1023px) {
+    #sidebar-nav { display: none; }
+    #bottom-nav { display: flex; }
+  }
+</style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+
+<!-- Desktop Sidebar Nav -->
+<nav id="sidebar-nav" class="fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col items-start px-4 py-10 gap-2 z-40">
+  <div class="mb-8 px-2">
+    <h1 class="font-headline text-2xl text-primary font-bold">EthnicEats</h1>
+  </div>
+  <a href="/accueil" class="sidebar-item active flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-primary bg-primary/5 font-semibold">
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">home</span>
+    Accueil
+  </a>
+  <a href="/panier" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">shopping_bag</span>
+    Panier
+  </a>
+  <a href="/suivi-commande" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">local_shipping</span>
+    Suivi
+  </a>
+  <a href="/profil-client" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">person</span>
+    Profil
+  </a>
+</nav>
+
+<!-- Main Content -->
+<main class="lg:ml-64 pt-10 px-6 lg:px-10 max-w-2xl lg:max-w-none mx-auto pb-28 lg:pb-12">
+
+  <!-- Hero Section -->
+  <section class="mb-4 lg:text-left">
+    <h1 id="greeting" class="text-4xl font-bold text-primary mb-2 leading-tight">Bonjour 👋</h1>
+    <p class="text-on-surface-variant text-lg leading-relaxed">Qu'est-ce que vous voulez cuisiner aujourd'hui ?</p>
+  </section>
+
+  <!-- Search Bar -->
+  <section class="mb-6 lg:max-w-xl lg:ml-0">
+    <div class="relative group">
+      <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+      <input
+        id="search-input"
+        class="w-full bg-surface-container-low border-none rounded-2xl py-4 pl-12 pr-6 text-on-surface placeholder:text-outline transition-all duration-300"
+        placeholder="Rechercher une recette ou un ingrédient..."
+        type="text"
+      />
+      <div id="search-results" class="hidden absolute top-full mt-2 w-full bg-surface-container-lowest rounded-2xl shadow-xl z-10 max-h-72 overflow-y-auto"></div>
+    </div>
+  </section>
+
+  <!-- Recettes populaires -->
+  <section class="mb-8">
+    <div class="flex justify-between items-end mb-4">
+      <h2 class="text-2xl font-bold text-primary">Populaires</h2>
+    </div>
+    <div id="populaires-list" class="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory lg:grid lg:grid-cols-4 lg:overflow-visible">
+      <!-- Chargé dynamiquement -->
+      <div class="flex gap-4 animate-pulse">
+        <div class="min-w-[160px] h-48 bg-surface-container rounded-3xl"></div>
+        <div class="min-w-[160px] h-48 bg-surface-container rounded-3xl"></div>
+        <div class="min-w-[160px] h-48 bg-surface-container rounded-3xl"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="mb-8">
+    <div class="flex justify-between items-end mb-4">
+      <h2 class="text-2xl font-bold text-primary">Catégories de recettes</h2>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <div class="category-card relative group overflow-hidden rounded-3xl bg-surface-container-lowest aspect-[4/5] shadow-sm cursor-pointer" onclick="window.location.href='/categorie?cat=Marocain'">
+        <img class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxSta5HkTK_sh9kvJQm1PQW8colNGPBSd5Ri5aqzNuDjuG8rGk2Cdohon-KqyPx6AJ8UIx6ionPSJWbHA7AXz7DXCILf6Uh9p1P41diBKc0dTkWvgbSyCkezwhRS3IpGXDybCqi6wVW4CdcyB0fvZV1YrZXHzQ15AffvhZTzBKdYrG5SvKiAd0iqKH_aK2K7cuHVo3Jr18cBqiJHNL_6usd2id8ZK9V7E96RN8UgADpGc3yQr1A4ggJid_6dzUluRZN2IKpkcZxbfl" alt="Marocain"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-4 w-full">
+          <h3 class="text-white text-xl font-bold mb-1 lg:text-2xl">Marocain</h3>
+          <p class="text-white/80 text-xs leading-snug lg:text-base">Découvrez les saveurs traditionnelles du Maroc</p>
+        </div>
+      </div>
+
+      <div class="category-card relative group overflow-hidden rounded-3xl bg-surface-container-lowest aspect-[4/5] shadow-sm cursor-pointer" onclick="window.location.href='/categorie?cat=Italien'">
+        <img class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOD3KpJ9hYZ5MfgWQn1nbyMWNwH15J3M-yZAaQUMYu1gd9b9Xdrk--PF7VjcLYnTBKneOkIKHATredEKeFrY9OkGJBpdP5TA6qjhJfMNxis0jHaZWUYfsudmlKFw_C-aeJR1L-oHh9wFc4LSHK4i3FIJ3JrbyycUnHHRGILgVzaK7ALVmSSyZjhhkI-sx30Zr9FDWGnp2RldA0DmVsu8rz_bupjPHmrkUhpjH-p0Qgj9KIeWDnpzaIzXyicRu9KOjItaWpUmn9-GnF" alt="Italien"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-4 w-full">
+          <h3 class="text-white text-xl font-bold mb-1 lg:text-2xl">Italien</h3>
+          <p class="text-white/80 text-xs leading-snug lg:text-base">Des recettes simples et savoureuses d'Italie</p>
+        </div>
+      </div>
+
+      <div class="category-card relative group overflow-hidden rounded-3xl bg-surface-container-lowest aspect-[4/5] shadow-sm cursor-pointer" onclick="window.location.href='/asiatique'">
+        <img class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMBVtchDyzWnKb_zjM5_PZRFpU0xpZwUoy-Q3lz60b_JCdY3fGA6F0vGhQy-STglZClF2sWHTuk_X8XPAuEkQAeTdkXFk2RJ-5eVzQUFAOIhAKKf0VCge2QWU_yQdncbu0EKqqqrMQGXHT10Hp8VpTovK2XOdqHXGf2jh-LMbxAwNK4lKl0Lou1mliskxF-6xQt2f5Yk5F6dptXp0f8HE8ncMkWDjVPk5A99pCWZsdbXxH54RYu-q8_U0X_C3Q0X1GUMps1E_hmwuu" alt="Asiatique"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-4 w-full">
+          <h3 class="text-white text-xl font-bold mb-1 lg:text-2xl">Asiatique</h3>
+          <p class="text-white/80 text-xs leading-snug lg:text-base">Voyagez à travers les cuisines d'Asie</p>
+        </div>
+      </div>
+
+      <div class="category-card relative group overflow-hidden rounded-3xl bg-surface-container-lowest aspect-[4/5] shadow-sm cursor-pointer" onclick="window.location.href='/categorie?cat=Mexicain'">
+        <img class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPz4OAsKZLPgHowdY5j0k7E__31OpuKkhyjbw2SDacr5pAUWuWwvZDVP0qimMrS_iXGDFsovN3XqX7C5ihAMoe8Utr0hY2VpVuuAie4CoCxtBQthlox0TOrTjSdBQRo5MEdspzwN4-Jyb0MZVdjd4JV5hC0i1tqCJ31lHtrULJLg3BSKUT6VwcGBTRt5NqXExWObcPcxtHdfkYxXtft8iEEGreHDyHEOK5h64Vxf3i15FakbOt4_EsTdb1e9s7YWiADvEwp7KtC6Qf" alt="Mexicain"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-4 w-full">
+          <h3 class="text-white text-xl font-bold mb-1 lg:text-2xl">Mexicain</h3>
+          <p class="text-white/80 text-xs leading-snug lg:text-base">Des plats épicés et riches en goût</p>
+        </div>
+      </div>
+
+      <div class="category-card relative group overflow-hidden rounded-3xl bg-surface-container-lowest aspect-[4/5] shadow-sm cursor-pointer" onclick="window.location.href='/categorie?cat=Espagnol'">
+        <img class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxS46zgjYBtoQlrRxSqzhhfc3bMXmzrK631b0o8Cl-NzAlftiaidpKpKdAFU7xFlVdLPIrqf9rR5r4qvSL6GddQHh7v3HaMHhmTG8W95vBOxcD3AbKrdtJ2YAc6KzYaRZzpI09X4DJNWRcDo6C8vWZVCZozO7JGV1sV0MgN5kDUgiNWJ2grzdKL5izIiC1wUDKJvHAo_4IG0b2zpS7OvgMZEvt2Efsk-8Ef94MvoJM4LnJw5-yQJck2phmwSutGYfAkAgO69-L4p29" alt="Espagnol"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-4 w-full">
+          <h3 class="text-white text-xl font-bold mb-1 lg:text-2xl">Espagnol</h3>
+          <p class="text-white/80 text-xs leading-snug lg:text-base">Des recettes méditerranéennes pleines de soleil</p>
+        </div>
+      </div>
+
+      <div class="category-card relative group overflow-hidden rounded-3xl bg-surface-container-lowest aspect-[4/5] shadow-sm cursor-pointer" onclick="window.location.href='/categorie?cat=Français'">
+        <img class="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATIrsCrpMXqZXdRkLhenQC5lR2xBYC2m6O4qTnlGwc1kBUrLLgB3VUf1xXflxfYVX4mIZ-QWNb45TYmsZcHNJ1cqlvvyjtYhhMyDfu2-N2NyoRlFm5HVAy897Yw1RdUBOhPKVVduXZfjx7ANcssIrOAylFEWPPMCaVVXoVkVoODxKcpSFNzf3vQNR89ejHmSkHtpdgnnyrkO-dcK06gfp9Pb6DbL7GwHT4mbxOFnhol-DH9rz78qJ4UuMVHv4DxX8b7RAEN9" alt="Français"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-4 w-full">
+          <h3 class="text-white text-xl font-bold mb-1 lg:text-2xl">Français</h3>
+          <p class="text-white/80 text-xs leading-snug lg:text-base">Cuisine classique et raffinée française</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- Bottom Nav (mobile) -->
+<nav id="bottom-nav" class="fixed bottom-0 left-0 w-full z-50 justify-around items-center px-4 pb-8 pt-4 bg-[#fcf9f8]/90 backdrop-blur-2xl rounded-t-[2rem] shadow-[0_-12px_32px_rgba(27,28,28,0.04)] font-['Manrope'] text-[11px] font-medium uppercase tracking-widest">
+  <a id="nav-accueil" class="nav-item active flex flex-col items-center justify-center px-4 py-2 transition-all" href="/accueil">
+    <span class="material-symbols-outlined mb-1">home</span>
+    <span>Accueil</span>
+  </a>
+  <a id="nav-panier" class="nav-item flex flex-col items-center justify-center px-4 py-2 transition-all" href="/panier">
+    <span class="material-symbols-outlined mb-1">shopping_bag</span>
+    <span>Panier</span>
+  </a>
+  <a id="nav-suivi" class="nav-item flex flex-col items-center justify-center px-4 py-2 transition-all" href="/suivi-commande">
+    <span class="material-symbols-outlined mb-1">local_shipping</span>
+    <span>Suivi</span>
+  </a>
+  <a id="nav-profil" class="nav-item flex flex-col items-center justify-center px-4 py-2 transition-all" href="/profil-client">
+    <span class="material-symbols-outlined mb-1">person</span>
+    <span>Profil</span>
+  </a>
+</nav>
+
+<script type="module">
+import { protegerPage } from '../../controllers/authController.js';
+import { getAllRecettes, rechercherRecettes, getRecettesPopulaires } from '../../controllers/recetteController.js';
+
+// ─── Auth guard ───────────────────────────────────────────────────────────────
+// const utilisateur = // await protegerPage('client'); // BYPASS TEST // BYPASS TEST
+if (!utilisateur) throw new Error('Redirection en cours');
+
+// ─── Greeting ─────────────────────────────────────────────────────────────────
+const nom = utilisateur.nomComplet
+  || utilisateur.profil?.nomComplet
+  || utilisateur.profil?.nom
+  || utilisateur.profil?.displayName
+  || 'vous';
+const prenom = String(nom).trim().split(' ')[0] || 'vous';
+document.getElementById('greeting').textContent = `Bonjour, ${prenom} 👋`;
+
+// ─── Recettes populaires ──────────────────────────────────────────────────────
+async function chargerPopulaires() {
+  const container = document.getElementById('populaires-list');
+  const recettes = await getRecettesPopulaires();
+  container.innerHTML = '';
+
+  recettes.slice(0, 6).forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'min-w-[160px] lg:min-w-0 relative group overflow-hidden rounded-3xl aspect-[3/4] shadow-sm cursor-pointer snap-start flex-shrink-0';
+    card.onclick = () => window.location.href = `/recette-detail?id=${r.id}`;
+    card.innerHTML = `
+      <img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+           src="${r.image || 'https://via.placeholder.com/300x400'}" alt="${r.titre}"/>
+      <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/10 to-transparent"></div>
+      <div class="absolute bottom-0 left-0 p-3 w-full">
+        <p class="text-white text-sm font-bold leading-tight">${r.titre}</p>
+        <p class="text-white/70 text-xs mt-0.5">${r.categorie}</p>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+chargerPopulaires();
+
+// ─── Recherche ────────────────────────────────────────────────────────────────
+let searchTimeout;
+const searchInput  = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  const q = searchInput.value.trim();
+
+  if (q.length < 2) {
+    searchResults.classList.add('hidden');
+    return;
+  }
+
+  searchTimeout = setTimeout(async () => {
+    const recettes = await rechercherRecettes(q);
+    if (!recettes.length) {
+      searchResults.classList.add('hidden');
+      return;
+    }
+
+    searchResults.innerHTML = recettes.slice(0, 5).map(r => `
+      <div class="flex items-center gap-3 px-4 py-3 hover:bg-surface-container cursor-pointer border-b border-outline-variant/10 last:border-0"
+           onclick="window.location.href='/recette-detail?id=${r.id}'">
+        <img src="${r.image || ''}" class="w-10 h-10 rounded-xl object-cover" alt="${r.titre}"/>
+        <div>
+          <p class="text-sm font-semibold text-on-surface">${r.titre}</p>
+          <p class="text-xs text-on-surface-variant">${r.categorie}</p>
+        </div>
+      </div>
+    `).join('');
+    searchResults.classList.remove('hidden');
+  }, 300);
+});
+
+document.addEventListener('click', (e) => {
+  if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+    searchResults.classList.add('hidden');
+  }
+});
+</script>
+</body>
+</html>

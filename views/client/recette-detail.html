@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Détail Recette</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "inverse-primary": "#a5d0b9",
+          "error": "#ba1a1a",
+          "surface-container-high": "#eae7e7",
+          "primary-container": "#1b4332",
+          "primary": "#012d1d",
+          "surface-container-low": "#f6f3f2",
+          "tertiary": "#282622",
+          "error-container": "#ffdad6",
+          "surface-container-lowest": "#ffffff",
+          "surface": "#fcf9f8",
+          "on-primary-container": "#86af99",
+          "secondary-container": "#fed488",
+          "outline-variant": "#c1c8c2",
+          "on-error-container": "#93000a",
+          "background": "#fcf9f8",
+          "on-background": "#1b1c1c",
+          "on-tertiary": "#ffffff",
+          "on-secondary": "#ffffff",
+          "tertiary-container": "#3e3c37",
+          "surface-container": "#f0eded",
+          "on-surface-variant": "#414844",
+          "outline": "#717973",
+          "on-primary": "#ffffff",
+          "secondary": "#775a19",
+          "on-secondary-container": "#785a1a",
+          "surface-bright": "#fcf9f8",
+          "primary-fixed-dim": "#a5d0b9",
+          "inverse-surface": "#303030",
+          "on-surface": "#1b1c1c",
+          "inverse-on-surface": "#f3f0ef",
+          "primary-fixed": "#c1ecd4",
+          "on-error": "#ffffff",
+          "surface-container-highest": "#e5e2e1",
+          "surface-tint": "#3f6653",
+          "surface-variant": "#e5e2e1",
+          "surface-dim": "#dcd9d9",
+          "secondary-fixed": "#ffdea5",
+          "secondary-fixed-dim": "#e9c176",
+        },
+        borderRadius: {
+          DEFAULT: "0.25rem",
+          lg: "0.5rem",
+          xl: "0.75rem",
+          full: "9999px"
+        },
+        fontFamily: {
+          headline: ["Playfair Display", "serif"],
+          display: ["Manrope", "sans-serif"],
+          body: ["Manrope", "sans-serif"],
+          label: ["Manrope", "sans-serif"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body { font-family: 'Manrope', sans-serif; }
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+  .sidebar-item { color: #9ca3af; transition: all 0.2s; }
+  .sidebar-item:hover { color: #012d1d; background: rgba(1,45,29,0.05); border-radius: 1rem; }
+  .sidebar-item.active { color: #012d1d; font-weight: 700; background: rgba(1,45,29,0.07); border-radius: 1rem; }
+  .sidebar-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  .tab-btn { border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab-btn.active { border-bottom-color: #012d1d; color: #012d1d; font-weight: 700; }
+
+  .fav-active { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; color: #e53e3e !important; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .skeleton { animation: pulse 1.5s ease-in-out infinite; background: #e5e2e1; border-radius: 0.5rem; }
+
+  .ing-icon { width: 48px; height: 48px; flex-shrink: 0; }
+</style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+
+<!-- ===== SIDEBAR DESKTOP UNIQUEMENT ===== -->
+<nav class="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col items-start px-4 py-10 gap-2 z-40">
+  <div class="mb-8 px-2">
+    <h1 class="font-headline text-2xl text-primary font-bold">EthnicEats</h1>
+  </div>
+  <a href="/accueil" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">home</span>Accueil
+  </a>
+  <a href="/panier" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">shopping_bag</span>Panier
+  </a>
+  <a href="/suivi-commande" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">local_shipping</span>Suivi
+  </a>
+  <a href="/profil-client" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">person</span>Profil
+  </a>
+</nav>
+
+<!-- ===== CONTENU PRINCIPAL ===== -->
+<main class="lg:ml-64 min-h-screen pb-12">
+
+  <!-- Header mobile -->
+  <header class="sticky top-0 z-30 bg-surface/90 backdrop-blur-md flex justify-between items-center px-4 py-3 lg:hidden border-b border-outline-variant/10">
+    <button onclick="history.back()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <span class="font-headline text-lg text-primary font-bold">EthnicEats</span>
+    <button onclick="toggleFavoris()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+      <span id="fav-icon-mobile" class="material-symbols-outlined text-primary">favorite</span>
+    </button>
+  </header>
+
+  <!-- Header desktop -->
+  <div class="hidden lg:flex justify-between items-center px-10 pt-8 pb-4">
+    <button onclick="history.back()" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-medium text-sm">
+      <span class="material-symbols-outlined">arrow_back</span>Retour
+    </button>
+    <button onclick="toggleFavoris()" class="flex items-center gap-2 px-4 py-2 rounded-full border border-outline-variant hover:bg-surface-container transition-colors text-on-surface-variant text-sm font-medium">
+      <span id="fav-icon-desktop" class="material-symbols-outlined text-[18px]">favorite</span>
+      <span id="fav-label">Ajouter aux favoris</span>
+    </button>
+  </div>
+
+  <!-- SKELETON -->
+  <div id="skeleton" class="px-4 lg:px-10 pt-4 max-w-5xl">
+    <div class="flex flex-col lg:flex-row gap-8 mb-8">
+      <div class="skeleton w-full lg:w-72 aspect-square rounded-3xl max-w-[280px] mx-auto lg:mx-0"></div>
+      <div class="flex-1 space-y-4">
+        <div class="skeleton h-10 w-2/3 rounded-xl"></div>
+        <div class="skeleton h-4 w-full rounded"></div>
+        <div class="skeleton h-4 w-5/6 rounded"></div>
+        <div class="skeleton h-4 w-4/6 rounded"></div>
+        <div class="flex gap-3 mt-6">
+          <div class="skeleton h-20 w-28 rounded-2xl"></div>
+          <div class="skeleton h-20 w-28 rounded-2xl"></div>
+          <div class="skeleton h-20 w-28 rounded-2xl"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECETTE CHARGÉE -->
+  <div id="recette-content" class="hidden px-4 lg:px-10 max-w-5xl">
+
+    <!-- Hero -->
+    <section class="flex flex-col lg:flex-row gap-8 mb-10">
+      <div class="flex-shrink-0 w-full lg:w-72 xl:w-80">
+        <div class="relative w-full aspect-square max-w-[280px] mx-auto lg:mx-0">
+          <img id="recette-image" alt="" class="w-full h-full rounded-3xl object-cover shadow-xl"/>
+          <span id="recette-badge" class="absolute top-3 left-3 bg-primary/90 text-on-primary text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full"></span>
+        </div>
+      </div>
+      <div class="flex-1 flex flex-col justify-center">
+        <h1 id="recette-titre" class="font-headline text-3xl lg:text-4xl xl:text-5xl text-primary mb-3 leading-tight"></h1>
+        <div class="mb-4">
+          <p id="recette-desc" class="text-on-surface-variant text-sm lg:text-base leading-relaxed line-clamp-4 lg:line-clamp-none"></p>
+          <button id="voir-plus-btn" onclick="toggleDesc()" class="text-primary font-semibold text-sm underline mt-1 lg:hidden">Voir plus</button>
+        </div>
+        <!-- Infos rapides -->
+        <div class="grid grid-cols-3 gap-3 mt-2">
+          <div class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-3 flex flex-col items-center text-center">
+            <span class="material-symbols-outlined text-primary mb-1 text-xl" style="font-variation-settings:'wght' 300">analytics</span>
+            <p class="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold mb-0.5">Difficulté</p>
+            <p id="recette-difficulte" class="font-bold text-primary text-[11px] lg:text-sm capitalize"></p>
+          </div>
+          <div class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-3 flex flex-col items-center text-center">
+            <span class="material-symbols-outlined text-primary mb-1 text-xl" style="font-variation-settings:'wght' 300">schedule</span>
+            <p class="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold mb-0.5">Temps</p>
+            <p id="recette-temps" class="font-bold text-primary text-[11px] lg:text-sm"></p>
+          </div>
+          <div class="bg-surface-container-low border border-outline-variant/20 rounded-2xl p-3 flex flex-col items-center text-center">
+            <span class="material-symbols-outlined text-primary mb-1 text-xl" style="font-variation-settings:'wght' 300">people</span>
+            <p class="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold mb-0.5">Portions</p>
+            <p id="recette-portions" class="font-bold text-primary text-[11px] lg:text-sm"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABS -->
+    <section>
+      <div class="flex gap-10 border-b border-outline-variant/20 mb-6">
+        <button id="tab-ing" onclick="switchTab('ingredients')" class="tab-btn active text-primary pb-3 text-sm lg:text-base font-medium tracking-wide">
+          Ingrédients
+        </button>
+        <button id="tab-inst" onclick="switchTab('instructions')" class="tab-btn text-on-surface-variant pb-3 text-sm lg:text-base font-medium tracking-wide">
+          Instructions
+        </button>
+      </div>
+
+      <!-- Panel Ingrédients -->
+      <div id="panel-ingredients">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="text-on-surface-variant text-sm font-medium">Pour :</span>
+          <div class="flex items-center gap-3 bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant/20">
+            <button onclick="changePortions(-1)" class="w-7 h-7 rounded-full bg-surface flex items-center justify-center text-primary shadow-sm hover:bg-white transition-all border border-outline-variant/20 active:scale-90">
+              <span class="material-symbols-outlined text-sm">remove</span>
+            </button>
+            <span id="portions-count" class="font-bold text-primary text-sm min-w-[20px] text-center">4</span>
+            <span class="text-on-surface-variant text-sm">pers.</span>
+            <button onclick="changePortions(1)" class="w-7 h-7 rounded-full bg-surface flex items-center justify-center text-primary shadow-sm hover:bg-white transition-all border border-outline-variant/20 active:scale-90">
+              <span class="material-symbols-outlined text-sm">add</span>
+            </button>
+          </div>
+        </div>
+
+        <ul id="ingredients-list" class="space-y-3 mb-6"></ul>
+
+        <div class="p-4 bg-primary/5 rounded-2xl border border-primary/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <p class="text-on-surface-variant text-xs uppercase tracking-widest font-bold mb-1">Total estimé</p>
+            <p id="prix-total" class="text-primary font-bold text-2xl"></p>
+          </div>
+          <button onclick="ajouterAuPanier()" id="add-to-cart-btn" class="w-full sm:w-auto bg-primary text-on-primary rounded-full px-6 py-3 flex items-center justify-center gap-2 font-semibold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/10 active:scale-[0.97]">
+            <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+            <span class="uppercase tracking-wide">Ajouter au panier</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel Instructions -->
+      <div id="panel-instructions" class="hidden">
+        <ol id="instructions-list" class="space-y-5 max-w-2xl"></ol>
+      </div>
+    </section>
+  </div>
+
+  <!-- Erreur -->
+  <div id="error-state" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+    <span class="material-symbols-outlined text-6xl text-outline mb-4">sentiment_dissatisfied</span>
+    <p class="text-on-surface-variant text-lg font-medium mb-4">Recette introuvable</p>
+    <a href="/accueil" class="bg-primary text-on-primary rounded-full px-6 py-3 font-semibold text-sm">Retour à l'accueil</a>
+  </div>
+
+</main>
+
+<script type="module">
+import { getRecetteById } from '../../controllers/recetteController.js';
+import { initialiserPanier } from '../../controllers/panierController.js';
+import { getCurrentUser } from '../../services/authService.js';
+import { toggleFavori as toggleFavoriFS, isFavori as isFavoriFS } from '../../controllers/clientController.js';
+
+// ===== LIBRAIRIE D'ICÔNES SVG =====
+const ICONES = {
+  'carrot':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="29" rx="10" ry="13" fill="#FF8C42"/><ellipse cx="24" cy="29" rx="6" ry="9" fill="#FF7020" opacity="0.3"/><path d="M20 16 Q24 9 28 14 M24 16 Q24 9 24 14 M28 17 Q32 9 28 15" stroke="#4CAF50" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>`,
+  'onion':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="30" rx="13" ry="12" fill="#C9A0DC"/><ellipse cx="24" cy="30" rx="8" ry="8" fill="#E0C0F0" opacity="0.5"/><path d="M18 19 Q24 12 30 19" stroke="#4CAF50" stroke-width="2.5" stroke-linecap="round" fill="none"/><rect x="22" y="10" width="4" height="10" rx="2" fill="#388E3C"/></svg>`,
+  'tomato':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="29" r="14" fill="#E53935"/><circle cx="19" cy="25" r="4" fill="#EF5350" opacity="0.3"/><path d="M19 15 Q24 10 29 15 M24 15 V10" stroke="#4CAF50" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>`,
+  'zucchini':      `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="28" rx="8" ry="16" fill="#66BB6A" transform="rotate(-12 24 28)"/><ellipse cx="24" cy="28" rx="4" ry="11" fill="#81C784" opacity="0.4" transform="rotate(-12 24 28)"/><rect x="21" y="10" width="7" height="6" rx="3" fill="#388E3C" transform="rotate(-12 24 13)"/></svg>`,
+  'turnip':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="32" rx="13" ry="10" fill="#DDA0DD"/><ellipse cx="24" cy="23" rx="13" ry="8" fill="#FAFAF5"/><path d="M18 14 Q24 9 30 14" stroke="#4CAF50" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
+  'potato':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="27" rx="15" ry="12" fill="#C8A96E"/><circle cx="17" cy="23" r="2" fill="#9A7840"/><circle cx="28" cy="29" r="2" fill="#9A7840"/><circle cx="22" cy="33" r="1.5" fill="#9A7840"/></svg>`,
+  'pepper':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="29" rx="11" ry="13" fill="#E53935"/><ellipse cx="20" cy="26" rx="4" ry="6" fill="#EF5350" opacity="0.3"/><path d="M24 16 Q26 11 24 9 Q22 11 24 16" fill="#4CAF50"/></svg>`,
+  'eggplant':      `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="31" rx="12" ry="13" fill="#7B1FA2"/><ellipse cx="20" cy="28" rx="5" ry="7" fill="#9C27B0" opacity="0.3"/><path d="M24 18 Q26 11 29 9" stroke="#388E3C" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>`,
+  'mushroom':      `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="22" rx="17" ry="12" fill="#8D6E63"/><ellipse cx="24" cy="19" rx="12" ry="8" fill="#A1887F" opacity="0.4"/><rect x="20" y="31" width="8" height="10" rx="3" fill="#D7CCC8"/></svg>`,
+  'garlic':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="29" rx="11" ry="11" fill="#F5F0DC"/><ellipse cx="18" cy="27" rx="7" ry="9" fill="#EDE8D0"/><ellipse cx="30" cy="27" rx="7" ry="9" fill="#EDE8D0"/><path d="M24 13 V9" stroke="#8BC34A" stroke-width="3" stroke-linecap="round"/></svg>`,
+  'lamb':          `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="28" rx="14" ry="11" fill="#D2691E"/><ellipse cx="24" cy="28" rx="8" ry="7" fill="#CD853F" opacity="0.4"/><circle cx="16" cy="19" r="4" fill="#DEB887"/><circle cx="23" cy="16" r="4" fill="#DEB887"/><circle cx="31" cy="18" r="4" fill="#DEB887"/></svg>`,
+  'beef':          `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="28" rx="15" ry="11" fill="#8B2500"/><ellipse cx="24" cy="28" rx="9" ry="7" fill="#A83200" opacity="0.4"/><path d="M13 23 Q24 19 35 23" stroke="#6B1C00" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`,
+  'chicken':       `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="30" rx="13" ry="12" fill="#F0D090"/><ellipse cx="24" cy="30" rx="7" ry="8" fill="#DEB870" opacity="0.4"/><circle cx="24" cy="17" r="7" fill="#F0D090"/><ellipse cx="24" cy="15" rx="4" ry="3" fill="#FFA07A"/></svg>`,
+  'whole-chicken': `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="29" rx="14" ry="13" fill="#D4A056"/><ellipse cx="24" cy="26" rx="9" ry="9" fill="#C4904A" opacity="0.3"/><circle cx="24" cy="15" r="8" fill="#D4A056"/><ellipse cx="24" cy="13" rx="5" ry="3.5" fill="#FF8C42"/></svg>`,
+  'fish':          `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="21" cy="26" rx="13" ry="9" fill="#87CEEB"/><path d="M34 26 L42 19 L42 33 Z" fill="#87CEEB"/><circle cx="13" cy="24" r="2" fill="#1565C0"/><path d="M15 23 Q21 19 28 23 Q21 27 15 29" stroke="#5599CC" stroke-width="1" fill="none"/></svg>`,
+  'salmon':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="21" cy="26" rx="13" ry="9" fill="#FA8072"/><path d="M34 26 L42 19 L42 33 Z" fill="#FA8072"/><circle cx="13" cy="24" r="2" fill="#8B0000"/><path d="M16 23 Q22 19 29 23 Q22 27 16 29" stroke="#E05A50" stroke-width="1" fill="none"/></svg>`,
+  'shrimp':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 37 Q16 21 28 17 Q37 15 38 21 Q40 29 32 33 Q24 37 12 37Z" fill="#FF8C42"/><path d="M14 36 Q18 23 27 19" stroke="#E06020" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  'semolina':      `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="32" rx="16" ry="7" fill="#F5DEB3"/><circle cx="16" cy="27" r="3" fill="#EDD9A3"/><circle cx="24" cy="25" r="3" fill="#EDD9A3"/><circle cx="32" cy="27" r="3" fill="#EDD9A3"/><circle cx="20" cy="33" r="3" fill="#EDD9A3"/><circle cx="29" cy="34" r="3" fill="#EDD9A3"/></svg>`,
+  'rice':          `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="31" rx="16" ry="7" fill="#F0EAD6"/><ellipse cx="17" cy="27" rx="4" ry="2" fill="#FFFAF0"/><ellipse cx="26" cy="25" rx="4" ry="2" fill="#FFFAF0"/><ellipse cx="21" cy="33" rx="4" ry="2" fill="#FFFAF0"/><ellipse cx="30" cy="31" rx="4" ry="2" fill="#FFFAF0"/></svg>`,
+  'pasta':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 21 Q24 15 38 21 Q24 27 10 21Z" fill="#F5DEB3"/><path d="M10 27 Q24 21 38 27 Q24 33 10 27Z" fill="#EDD9A3"/><path d="M10 33 Q24 27 38 33 Q24 39 10 33Z" fill="#F5DEB3"/></svg>`,
+  'bread':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="29" rx="17" ry="11" fill="#D2691E"/><ellipse cx="24" cy="25" rx="15" ry="9" fill="#CD853F"/><path d="M15 27 Q24 23 33 27" stroke="#A0522D" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`,
+  'flour':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" y="15" width="24" height="27" rx="4" fill="#F5F5DC"/><rect x="16" y="19" width="16" height="4" rx="2" fill="#E8E8C8"/><ellipse cx="24" cy="38" rx="10" ry="4" fill="#EBEBD0"/></svg>`,
+  'chickpeas':     `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="27" r="6" fill="#D4B483"/><circle cx="30" cy="25" r="6" fill="#C8A870"/><circle cx="24" cy="35" r="6" fill="#D4B483"/><circle cx="22" cy="21" r="5" fill="#C8A870"/></svg>`,
+  'lentils':       `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="17" cy="27" rx="5" ry="4" fill="#8B6914"/><ellipse cx="27" cy="23" rx="5" ry="4" fill="#A0782A"/><ellipse cx="24" cy="33" rx="5" ry="4" fill="#8B6914"/><ellipse cx="32" cy="31" rx="4" ry="3" fill="#9A7020"/></svg>`,
+  'prunes':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="20" cy="27" rx="8" ry="10" fill="#6A0DAD"/><ellipse cx="30" cy="29" rx="8" ry="9" fill="#7B1FA2"/><ellipse cx="20" cy="25" rx="4" ry="5" fill="#9C27B0" opacity="0.3"/></svg>`,
+  'almonds':       `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="19" cy="29" rx="6" ry="9" fill="#D2B48C" transform="rotate(-15 19 29)"/><ellipse cx="30" cy="27" rx="6" ry="9" fill="#C4A882" transform="rotate(10 30 27)"/><ellipse cx="24" cy="35" rx="5" ry="8" fill="#D2B48C" transform="rotate(-5 24 35)"/></svg>`,
+  'lemon':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="27" rx="14" ry="12" fill="#FFE135"/><ellipse cx="24" cy="27" rx="9" ry="8" fill="#FFD700" opacity="0.35"/><path d="M24 15 Q26 11 28 9" stroke="#9ACD32" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>`,
+  'coconut':       `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="27" r="14" fill="#7B4F2E"/><circle cx="24" cy="27" r="9" fill="#F5DEB3"/><circle cx="20" cy="23" r="2" fill="#5C3317"/><circle cx="28" cy="23" r="2" fill="#5C3317"/><circle cx="24" cy="29" r="2" fill="#5C3317"/></svg>`,
+  'eggs':          `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="20" cy="28" rx="8" ry="11" fill="#FFF8E7"/><ellipse cx="32" cy="30" rx="7" ry="10" fill="#FFF8E7"/><ellipse cx="20" cy="30" rx="4" ry="5" fill="#FFD700" opacity="0.5"/><ellipse cx="32" cy="32" rx="3.5" ry="4.5" fill="#FFD700" opacity="0.5"/></svg>`,
+  'butter':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="21" width="28" height="16" rx="4" fill="#FFE082"/><rect x="10" y="21" width="28" height="7" rx="4" fill="#FFD54F"/><rect x="14" y="28" width="20" height="3" rx="1.5" fill="#FFB300" opacity="0.4"/></svg>`,
+  'cheese':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="8,35 24,15 40,35" fill="#FFD54F"/><polygon points="8,35 40,35 40,39 8,39" fill="#FFC107"/><circle cx="20" cy="29" r="3" fill="#FF8F00" opacity="0.5"/><circle cx="30" cy="26" r="2.5" fill="#FF8F00" opacity="0.5"/></svg>`,
+  'cream':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" y="17" width="24" height="24" rx="6" fill="#FFFDE7"/><path d="M16 25 Q24 19 32 25" stroke="#FFF9C4" stroke-width="2" fill="none"/><ellipse cx="24" cy="17" rx="12" ry="5" fill="#FFFDE7"/></svg>`,
+  'milk':          `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="13" width="20" height="29" rx="6" fill="#F5F5F5"/><rect x="14" y="13" width="20" height="10" rx="6" fill="#ECEFF1"/><rect x="16" y="28" width="16" height="3" rx="1.5" fill="#B0BEC5" opacity="0.3"/></svg>`,
+  'olive-oil':     `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="17" y="17" width="14" height="23" rx="4" fill="#D4E157"/><rect x="17" y="17" width="14" height="9" rx="4" fill="#C6D73F"/><rect x="15" y="13" width="18" height="6" rx="3" fill="#9E9E9E"/><rect x="19" y="9" width="10" height="5" rx="2" fill="#757575"/></svg>`,
+  'honey':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="13" y="17" width="22" height="23" rx="6" fill="#FFA000"/><rect x="13" y="17" width="22" height="10" rx="6" fill="#FFB300"/><rect x="11" y="13" width="26" height="6" rx="3" fill="#FF8F00"/><path d="M20 9 L28 9 L26 13 L22 13 Z" fill="#FF6F00"/></svg>`,
+  'tomato-sauce':  `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="13" y="15" width="22" height="26" rx="5" fill="#E53935"/><rect x="13" y="15" width="22" height="10" rx="5" fill="#EF5350"/><rect x="11" y="11" width="26" height="6" rx="3" fill="#B71C1C"/></svg>`,
+  'soy-sauce':     `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="15" width="16" height="25" rx="5" fill="#3E2723"/><rect x="16" y="15" width="16" height="8" rx="5" fill="#4E342E"/><rect x="14" y="11" width="20" height="6" rx="3" fill="#6D4C41"/><path d="M29 7 Q33 9 33 15" stroke="#5D4037" stroke-width="2" fill="none"/></svg>`,
+  'spice-blend':   `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="29" r="5" fill="#FF8C42"/><circle cx="28" cy="25" r="5" fill="#FF5722"/><circle cx="24" cy="34" r="5" fill="#E65100"/><circle cx="32" cy="32" r="4" fill="#BF360C"/></svg>`,
+  'cinnamon':      `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="12" width="9" height="28" rx="4.5" fill="#8B4513" transform="rotate(-10 24 26)"/><rect x="22" y="12" width="5" height="28" rx="2.5" fill="#A0522D" opacity="0.5" transform="rotate(-10 24 26)"/></svg>`,
+  'ginger':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="29" rx="10" ry="8" fill="#F5DEB3"/><ellipse cx="16" cy="23" rx="6" ry="5" fill="#EDD9A3" transform="rotate(-20 16 23)"/><ellipse cx="33" cy="25" rx="6" ry="5" fill="#EDD9A3" transform="rotate(20 33 25)"/><ellipse cx="20" cy="35" rx="5" ry="4" fill="#DFD0A0" transform="rotate(-10 20 35)"/></svg>`,
+  'saffron':       `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 37 Q20 25 22 13" stroke="#FF6B00" stroke-width="3" stroke-linecap="round"/><path d="M24 37 Q28 25 26 13" stroke="#FF8C00" stroke-width="3" stroke-linecap="round"/><path d="M24 37 Q16 27 14 17" stroke="#FFA500" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="37" r="3" fill="#CC4400"/></svg>`,
+  'parsley':       `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="20" cy="21" rx="8" ry="6" fill="#4CAF50" transform="rotate(-20 20 21)"/><ellipse cx="30" cy="19" rx="8" ry="6" fill="#388E3C" transform="rotate(20 30 19)"/><ellipse cx="24" cy="27" rx="7" ry="5" fill="#4CAF50"/><rect x="22" y="29" width="4" height="11" rx="2" fill="#388E3C"/></svg>`,
+  'coriander':     `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="19" rx="7" ry="5" fill="#66BB6A" transform="rotate(-30 18 19)"/><ellipse cx="30" cy="17" rx="7" ry="5" fill="#4CAF50" transform="rotate(30 30 17)"/><ellipse cx="24" cy="25" rx="6" ry="5" fill="#66BB6A"/><rect x="22" y="29" width="4" height="11" rx="2" fill="#388E3C"/></svg>`,
+  'mint':          `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="16" cy="21" rx="7" ry="5" fill="#00BFA5" transform="rotate(-25 16 21)"/><ellipse cx="32" cy="19" rx="7" ry="5" fill="#00897B" transform="rotate(25 32 19)"/><ellipse cx="24" cy="27" rx="8" ry="5" fill="#00BFA5"/><rect x="22" y="29" width="4" height="11" rx="2" fill="#00695C"/></svg>`,
+  'basil':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="21" rx="8" ry="6" fill="#2E7D32" transform="rotate(-20 18 21)"/><ellipse cx="30" cy="19" rx="8" ry="6" fill="#388E3C" transform="rotate(20 30 19)"/><ellipse cx="24" cy="29" rx="9" ry="6" fill="#43A047"/><rect x="22" y="31" width="4" height="10" rx="2" fill="#2E7D32"/></svg>`,
+  'cumin':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="27" rx="4" ry="9" fill="#8D6E63" transform="rotate(-15 18 27)"/><ellipse cx="26" cy="25" rx="4" ry="9" fill="#795548" transform="rotate(5 26 25)"/><ellipse cx="33" cy="28" rx="3.5" ry="8" fill="#8D6E63" transform="rotate(20 33 28)"/></svg>`,
+  'paprika':       `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="29" rx="14" ry="10" fill="#C62828"/><ellipse cx="24" cy="29" rx="9" ry="6" fill="#D32F2F" opacity="0.4"/><path d="M24 19 Q26 13 28 11" stroke="#388E3C" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>`,
+  'turmeric':      `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="29" rx="12" ry="9" fill="#F9A825"/><ellipse cx="16" cy="25" rx="7" ry="6" fill="#F57F17" transform="rotate(-15 16 25)"/><ellipse cx="33" cy="27" rx="7" ry="6" fill="#F9A825" transform="rotate(15 33 27)"/></svg>`,
+  'pastry-sheets': `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="21" width="32" height="4" rx="2" fill="#FFF9C4"/><rect x="8" y="27" width="32" height="4" rx="2" fill="#FFF59D"/><rect x="8" y="33" width="32" height="4" rx="2" fill="#FFF9C4"/></svg>`,
+  'powdered-sugar':`<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="33" rx="16" ry="6" fill="#F5F5F5"/><path d="M16 27 Q24 21 32 27 Q24 31 16 27Z" fill="#EEEEEE"/><circle cx="18" cy="23" r="2" fill="white"/><circle cx="26" cy="21" r="2" fill="white"/><circle cx="32" cy="24" r="2" fill="white"/></svg>`,
+  'sugar':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="11" y="17" width="26" height="23" rx="5" fill="#F9F9F9"/><rect x="15" y="21" width="18" height="3" rx="1.5" fill="#E0E0E0"/><rect x="15" y="27" width="18" height="3" rx="1.5" fill="#E0E0E0"/><rect x="15" y="33" width="12" height="3" rx="1.5" fill="#E0E0E0"/></svg>`,
+  'miso':          `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="11" y="17" width="26" height="23" rx="5" fill="#C8A06E"/><rect x="11" y="17" width="26" height="10" rx="5" fill="#B89060"/><rect x="9" y="13" width="30" height="6" rx="3" fill="#A07848"/></svg>`,
+  'wasabi':        `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="29" rx="13" ry="10" fill="#4CAF50"/><ellipse cx="24" cy="25" rx="9" ry="7" fill="#66BB6A" opacity="0.5"/><path d="M20 19 Q24 14 28 19" stroke="#388E3C" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`,
+  'shiso':         `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="24" rx="15" ry="12" fill="#7B1FA2" opacity="0.7"/><ellipse cx="24" cy="24" rx="10" ry="8" fill="#9C27B0" opacity="0.4"/><rect x="22" y="33" width="4" height="9" rx="2" fill="#6A1B9A"/></svg>`,
+  'default':       `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="27" r="14" fill="#E8F5E9"/><circle cx="24" cy="27" r="9" fill="#C8E6C9"/><path d="M18 21 Q24 17 30 21 Q30 31 24 33 Q18 31 18 21Z" fill="#4CAF50" opacity="0.5"/></svg>`,
+};
+
+function getIconeSVG(icone) {
+  if (!icone) return ICONES['default'];
+  const key = icone.toLowerCase().replace(/_/g, '-');
+  return ICONES[key] || ICONES['default'];
+}
+
+// ===== ÉTAT =====
+let recette = null;
+let portionsActuelles = 4;
+let isFavori = false;
+let descExpanded = false;
+let clientId = null;
+
+function _getPreferences() {
+  try {
+    const raw = localStorage.getItem('ethniceats_preferences');
+    return raw ? JSON.parse(raw) : { sourcePreferee: 'mix', budget: 'moyen', priorite: 'moins_cher' };
+  } catch (e) {
+    return { sourcePreferee: 'mix', budget: 'moyen', priorite: 'moins_cher' };
+  }
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) { showError(); return; }
+  try {
+    try {
+      const user = await getCurrentUser();
+      clientId = user?.uid || null;
+    } catch { clientId = null; }
+
+    recette = await getRecetteById(id);
+    if (!recette) { showError(); return; }
+    portionsActuelles = recette.portions || 4;
+    renderRecette();
+    await checkFavori();
+    document.getElementById('skeleton').classList.add('hidden');
+    document.getElementById('recette-content').classList.remove('hidden');
+    document.title = `EthnicEats — ${recette.titre}`;
+  } catch(e) {
+    console.error(e);
+    showError();
+  }
+});
+
+function showError() {
+  document.getElementById('skeleton').classList.add('hidden');
+  document.getElementById('error-state').classList.remove('hidden');
+}
+
+function renderRecette() {
+  document.getElementById('recette-image').src = recette.image || '';
+  document.getElementById('recette-image').alt = recette.titre;
+  document.getElementById('recette-titre').textContent = recette.titre;
+  document.getElementById('recette-desc').textContent = recette.descriptionLongue || recette.descriptionCourte || '';
+  document.getElementById('recette-badge').textContent = recette.categorie || '';
+  document.getElementById('recette-difficulte').textContent = recette.difficulte || '—';
+  document.getElementById('recette-temps').textContent = recette.tempsPreparation || '—';
+  document.getElementById('recette-portions').textContent = `${recette.portions || 4} pers.`;
+  document.getElementById('portions-count').textContent = portionsActuelles;
+  renderIngredients();
+  renderInstructions();
+}
+
+function renderIngredients() {
+  const ratio = portionsActuelles / (recette.portions || 4);
+  const list = document.getElementById('ingredients-list');
+  let total = 0;
+  list.innerHTML = (recette.ingredients || []).map(ing => {
+    const qte = Math.round(ing.quantiteRecette * ratio * 10) / 10;
+    const prix = Math.round((ing.prix || 0) * ratio);
+    total += prix;
+    return `
+      <li class="flex items-center gap-4 p-3 bg-surface-container-low rounded-2xl border border-outline-variant/15 hover:bg-surface-container transition-colors">
+        <div class="ing-icon">${getIconeSVG(ing.icone)}</div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-on-surface text-sm truncate">${ing.nom}</p>
+          <p class="text-on-surface-variant text-xs">${qte} ${ing.unite}</p>
+        </div>
+        <p class="font-bold text-primary text-sm flex-shrink-0">${prix} Dh</p>
+      </li>`;
+  }).join('');
+  document.getElementById('prix-total').textContent = `${total} Dh`;
+}
+
+function renderInstructions() {
+  const list = document.getElementById('instructions-list');
+  list.innerHTML = (recette.etapes || []).map((etape, i) => {
+    const texte = etape.replace(/^\d+\.\s*/, '');
+    return `
+      <li class="flex gap-4">
+        <span class="flex-shrink-0 w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">${i + 1}</span>
+        <p class="flex-1 pt-1 text-on-surface text-sm lg:text-base leading-relaxed">${texte}</p>
+      </li>`;
+  }).join('');
+}
+
+// ===== ONGLETS =====
+window.switchTab = function(tab) {
+  const isIng = tab === 'ingredients';
+  document.getElementById('panel-ingredients').classList.toggle('hidden', !isIng);
+  document.getElementById('panel-instructions').classList.toggle('hidden', isIng);
+  document.getElementById('tab-ing').classList.toggle('active', isIng);
+  document.getElementById('tab-inst').classList.toggle('active', !isIng);
+  document.getElementById('tab-ing').classList.toggle('text-primary', isIng);
+  document.getElementById('tab-inst').classList.toggle('text-primary', !isIng);
+  document.getElementById('tab-ing').classList.toggle('text-on-surface-variant', !isIng);
+  document.getElementById('tab-inst').classList.toggle('text-on-surface-variant', isIng);
+};
+
+window.changePortions = function(delta) {
+  portionsActuelles = Math.max(1, portionsActuelles + delta);
+  document.getElementById('portions-count').textContent = portionsActuelles;
+  renderIngredients();
+};
+
+window.toggleDesc = function() {
+  descExpanded = !descExpanded;
+  document.getElementById('recette-desc').classList.toggle('line-clamp-4', !descExpanded);
+  document.getElementById('voir-plus-btn').textContent = descExpanded ? 'Voir moins' : 'Voir plus';
+};
+
+function _lireFavorisLocal() {
+  try {
+    const raw = localStorage.getItem('favoris');
+    const ids = raw ? JSON.parse(raw) : [];
+    return Array.isArray(ids) ? ids.filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+}
+
+function _ecrireFavorisLocal(ids) {
+  try {
+    const uniques = Array.from(new Set((ids ?? []).filter(Boolean)));
+    localStorage.setItem('favoris', JSON.stringify(uniques));
+  } catch {}
+}
+
+async function checkFavori() {
+  if (!recette?.id) return;
+
+  // Si connecté : Firestore est la source de vérité
+  if (clientId) {
+    try {
+      const res = await isFavoriFS(clientId, recette.id);
+      if (res?.success !== true) throw new Error(res?.message || 'isFavori: impossible');
+      isFavori = !!res.estFavori;
+      // miroir local pour cohérence UI / pages offline
+      const favs = _lireFavorisLocal();
+      if (isFavori && !favs.includes(recette.id)) _ecrireFavorisLocal([...favs, recette.id]);
+      if (!isFavori && favs.includes(recette.id)) _ecrireFavorisLocal(favs.filter(id => id !== recette.id));
+      updateFavUI();
+      return;
+    } catch {
+      // si Firestore échoue, fallback localStorage
+    }
+  }
+
+  const favs = _lireFavorisLocal();
+  isFavori = favs.includes(recette.id);
+  updateFavUI();
+}
+
+window.toggleFavoris = async function() {
+  if (!recette?.id) return;
+
+  // Si connecté : on bascule côté Firestore
+  if (clientId) {
+    try {
+      const res = await toggleFavoriFS(clientId, recette.id);
+      if (res?.success !== true) throw new Error(res?.message || 'toggleFavori: impossible');
+      isFavori = !!res.estFavori;
+
+      const favs = _lireFavorisLocal();
+      if (isFavori) _ecrireFavorisLocal([...favs, recette.id]);
+      else _ecrireFavorisLocal(favs.filter(id => id !== recette.id));
+
+      updateFavUI();
+      return;
+    } catch {
+      // fallback localStorage
+    }
+  }
+
+  const favs = _lireFavorisLocal();
+  const next = isFavori ? favs.filter(id => id !== recette.id) : [...favs, recette.id];
+  _ecrireFavorisLocal(next);
+  isFavori = !isFavori;
+  updateFavUI();
+};
+
+function updateFavUI() {
+  const active = 'fav-active';
+  document.getElementById('fav-icon-mobile')?.classList.toggle(active, isFavori);
+  document.getElementById('fav-icon-desktop')?.classList.toggle(active, isFavori);
+  const label = document.getElementById('fav-label');
+  if (label) label.textContent = isFavori ? 'Retirer des favoris' : 'Ajouter aux favoris';
+}
+
+window.ajouterAuPanier = async function() {
+  if (!recette) return;
+  try {
+    const preferences = _getPreferences();
+    await initialiserPanier(recette, portionsActuelles, preferences);
+
+    // Nettoyage : évite que d'anciennes versions (legacy) gardent un panier divergent.
+    try { localStorage.removeItem('panier'); } catch (e) {}
+
+    const btn = document.getElementById('add-to-cart-btn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span><span class="uppercase tracking-wide">Ajouté !</span>';
+    btn.classList.add('bg-green-700');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('bg-green-700'); }, 1800);
+  } catch(e) { console.error(e); }
+};
+</script>
+</body>
+</html>

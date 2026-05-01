@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Mon panier</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#012d1d",
+          "on-primary": "#ffffff",
+          "primary-container": "#1b4332",
+          "primary-fixed": "#c1ecd4",
+          "primary-fixed-dim": "#a5d0b9",
+          "on-primary-fixed": "#002114",
+          "on-primary-fixed-variant": "#274e3d",
+          "on-primary-container": "#86af99",
+          "inverse-primary": "#a5d0b9",
+          "secondary": "#775a19",
+          "on-secondary": "#ffffff",
+          "secondary-container": "#fdd587",
+          "on-secondary-container": "#785a19",
+          "secondary-fixed": "#ffdea3",
+          "secondary-fixed-dim": "#e8c176",
+          "on-secondary-fixed": "#261900",
+          "on-secondary-fixed-variant": "#5c4200",
+          "surface": "#fbf9f8",
+          "surface-dim": "#dbdad9",
+          "surface-bright": "#fbf9f8",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f5f3f3",
+          "surface-container": "#efeded",
+          "surface-container-high": "#e9e8e7",
+          "surface-container-highest": "#e3e2e2",
+          "surface-variant": "#e3e2e2",
+          "on-surface": "#1b1c1c",
+          "on-surface-variant": "#414844",
+          "background": "#fbf9f8",
+          "on-background": "#1b1c1c",
+          "outline": "#717973",
+          "outline-variant": "#c1c8c2",
+          "error": "#ba1a1a",
+          "error-container": "#ffdad6",
+          "on-error": "#ffffff",
+          "on-error-container": "#93000a",
+          "inverse-surface": "#303030",
+          "inverse-on-surface": "#f2f0f0",
+          "tertiary": "#282622",
+          "on-tertiary": "#ffffff",
+          "tertiary-container": "#3e3b37",
+          "on-tertiary-container": "#aaa59f",
+          "tertiary-fixed": "#e7e2db",
+          "tertiary-fixed-dim": "#cbc6bf",
+          "on-tertiary-fixed": "#1d1b18",
+          "on-tertiary-fixed-variant": "#494642",
+          "surface-tint": "#3f6653",
+        },
+        borderRadius: {
+          DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"
+        },
+        fontFamily: {
+          headline: ["Playfair Display", "serif"],
+          body: ["Manrope", "sans-serif"],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body { font-family: 'Manrope', sans-serif; }
+  h1, h2 { font-family: 'Playfair Display', serif; }
+
+  .sidebar-item { color: #9ca3af; transition: all 0.2s; }
+  .sidebar-item:hover { color: #012d1d; background: rgba(1,45,29,0.05); border-radius: 1rem; }
+  .sidebar-item.active { color: #012d1d; font-weight: 700; background: rgba(1,45,29,0.07); border-radius: 1rem; }
+  .sidebar-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Animation entrée carte */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .cart-item { animation: slideIn 0.25s ease-out both; }
+
+  /* Skeleton */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .skeleton { animation: pulse 1.5s ease-in-out infinite; background: #e5e2e1; border-radius: 0.75rem; }
+
+  /* Popup overlay */
+  .overlay { background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); }
+</style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+
+<!-- ===== SIDEBAR DESKTOP ===== -->
+<nav class="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col items-start px-4 py-10 gap-2 z-40">
+  <div class="mb-8 px-2">
+    <h1 class="font-headline text-2xl text-primary font-bold">EthnicEats</h1>
+  </div>
+  <a href="/accueil" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">home</span>Accueil
+  </a>
+  <a href="/panier" class="sidebar-item active flex items-center gap-3 w-full px-4 py-3 rounded-2xl">
+    <span class="material-symbols-outlined">shopping_bag</span>Panier
+  </a>
+  <a href="/suivi-commande" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">local_shipping</span>Suivi
+  </a>
+  <a href="/profil-client" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">person</span>Profil
+  </a>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<main class="lg:ml-64 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-surface/90 backdrop-blur-md px-5 pt-6 pb-3 lg:px-10 lg:pt-8 lg:pb-4">
+    <div class="flex items-center gap-3">
+      <button onclick="history.back()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary flex-shrink-0">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </button>
+      <h1 id="page-title" class="font-headline text-3xl lg:text-4xl text-primary font-bold leading-tight">Mon panier</h1>
+    </div>
+  </header>
+
+  <!-- ===== ÉTAT VIDE ===== -->
+  <div id="empty-state" class="hidden flex-1 flex flex-col items-center justify-center text-center px-6 lg:-mt-12">
+    <div class="space-y-8 flex flex-col items-center">
+      <div class="relative flex items-center justify-center group">
+        <div class="absolute inset-0 bg-primary/5 blur-3xl rounded-full"></div>
+        <div class="relative w-44 h-44 rounded-full border border-primary/10 flex items-center justify-center bg-white shadow-xl shadow-primary/5">
+          <span class="material-symbols-outlined text-primary text-7xl opacity-75" style="font-variation-settings:'wght' 200">shopping_bag</span>
+        </div>
+        <div class="absolute -top-4 -right-4 w-12 h-12 bg-secondary-fixed rounded-full shadow-lg flex items-center justify-center animate-bounce">
+          <span class="material-symbols-outlined text-on-secondary-fixed text-lg">restaurant</span>
+        </div>
+        <div class="absolute bottom-2 -left-6 w-10 h-10 bg-primary-fixed rounded-full shadow-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-primary-fixed text-lg">eco</span>
+        </div>
+      </div>
+      <div class="max-w-[280px] space-y-3">
+        <h2 class="font-headline text-2xl text-primary font-bold">Panier vide</h2>
+        <p class="text-on-surface-variant text-sm leading-relaxed">Ajoutez des ingrédients depuis une recette pour les voir apparaître ici.</p>
+      </div>
+      <a href="/accueil" class="bg-primary text-on-primary px-8 py-4 rounded-full font-semibold text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all">
+        Découvrir les recettes
+      </a>
+    </div>
+    <!-- Déco fond -->
+    <div class="fixed -bottom-40 -left-40 w-80 h-80 bg-primary/5 blur-[100px] rounded-full pointer-events-none"></div>
+    <div class="fixed top-1/3 -right-20 w-64 h-64 bg-secondary-fixed/10 blur-[80px] rounded-full pointer-events-none"></div>
+  </div>
+
+  <!-- ===== ÉTAT REMPLI ===== -->
+  <div id="filled-state" class="hidden flex-1 flex flex-col">
+
+    <!-- Liste ingrédients -->
+    <div class="flex-1 overflow-y-auto hide-scrollbar px-5 lg:px-10 py-4 pb-36 space-y-3" id="ingredients-list">
+      <!-- Généré par JS -->
+    </div>
+
+    <!-- Barre récap fixe en bas -->
+    <div class="fixed bottom-0 left-0 lg:left-64 right-0 bg-white border-t border-surface-container-low shadow-[0_-8px_30px_rgba(0,0,0,0.08)] rounded-t-[2rem] z-30">
+      <div class="px-6 lg:px-10 pt-5 pb-7 flex items-center justify-between gap-4">
+        <div>
+          <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Total</p>
+          <p id="prix-total" class="font-headline text-2xl lg:text-3xl text-primary font-bold">— MAD</p>
+        </div>
+        <button onclick="passerCommande()" class="flex-1 max-w-[300px] bg-primary text-on-primary rounded-full py-4 px-6 font-semibold text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow-xl shadow-primary/15 hover:opacity-90 active:scale-[0.98] transition-all">
+          <span>Passer à la commande</span>
+          <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Skeleton loading -->
+  <div id="skeleton" class="px-5 lg:px-10 py-4 space-y-3">
+    <div class="skeleton h-24 w-full"></div>
+    <div class="skeleton h-24 w-full"></div>
+    <div class="skeleton h-24 w-full"></div>
+  </div>
+
+</main>
+
+<!-- ===== POPUP SUPPRESSION ===== -->
+<div id="popup-suppression" class="hidden fixed inset-0 z-50 overlay flex items-center justify-center px-6">
+  <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center">
+    <div class="w-14 h-14 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-4">
+      <span class="material-symbols-outlined text-error text-3xl">delete</span>
+    </div>
+    <h3 class="font-headline text-xl text-primary font-bold mb-2">Supprimer l'ingrédient ?</h3>
+    <p id="popup-ing-nom" class="text-on-surface-variant text-sm mb-6 leading-relaxed"></p>
+    <div class="flex gap-3">
+      <button onclick="fermerPopupSuppression()" class="flex-1 py-3 rounded-full border border-outline-variant text-on-surface-variant font-semibold text-sm hover:bg-surface-container transition-colors">
+        Annuler
+      </button>
+      <button onclick="confirmerSuppression()" class="flex-1 py-3 rounded-full bg-error text-on-error font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all">
+        Supprimer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-on-surface text-inverse-on-surface px-5 py-3 rounded-full text-sm font-semibold shadow-xl whitespace-nowrap transition-all"></div>
+
+<script type="module">
+import {
+  getPanier,
+  sauvegarderPanier,
+  supprimerIngredient,
+  modifierQuantite,
+  calculerSousTotal,
+} from '../../controllers/panierController.js';
+
+import { getIconeSVG } from '../../services/ingredientIcons.js';
+
+// ===== ÉTAT GLOBAL =====
+let panierData = null;
+let ingredientASupprimer = null;
+const preferences = _getPreferences();
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', async () => {
+  await chargerPanier();
+});
+
+async function chargerPanier() {
+  document.getElementById('skeleton').classList.remove('hidden');
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('filled-state').classList.add('hidden');
+
+  try {
+    panierData = await getPanier();
+
+    document.getElementById('skeleton').classList.add('hidden');
+
+    if (!panierData || !panierData.ingredients || panierData.ingredients.length === 0) {
+      afficherEtatVide();
+    } else {
+      afficherEtatRempli();
+    }
+  } catch (e) {
+    console.error('[panier]', e);
+    document.getElementById('skeleton').classList.add('hidden');
+    afficherEtatVide();
+  }
+}
+
+function afficherEtatVide() {
+  document.getElementById('empty-state').classList.remove('hidden');
+  document.getElementById('empty-state').classList.add('flex');
+  document.getElementById('filled-state').classList.add('hidden');
+  document.getElementById('page-title').textContent = 'Mon panier';
+}
+
+function afficherEtatRempli() {
+  document.getElementById('filled-state').classList.remove('hidden');
+  document.getElementById('filled-state').classList.add('flex');
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('empty-state').classList.remove('flex');
+  const count = panierData.ingredients.length;
+  document.getElementById('page-title').textContent = `Mon panier (${count})`;
+  renderIngredients();
+  updateTotal();
+}
+
+// ===== RENDU LISTE =====
+function renderIngredients() {
+  const list = document.getElementById('ingredients-list');
+  list.innerHTML = '';
+  (panierData.ingredients || []).forEach((ing, idx) => {
+    const card = document.createElement('div');
+    card.className = 'cart-item relative flex items-center gap-4 p-4 bg-surface-container-lowest rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-outline-variant/10';
+    card.style.animationDelay = `${idx * 40}ms`;
+    card.dataset.nom = ing.nom;
+
+    // Prix affiché
+    const prixAffiche = _prixIngredient(ing);
+
+    // Quantité affichée
+    const qteAffichee = ing.type === 'pack'
+      ? `${ing.quantitePanier} pack${ing.quantitePanier > 1 ? 's' : ''}`
+      : `${ing.quantiteRecette} ${ing.unite}`;
+
+    card.innerHTML = `
+      <!-- Bouton suppression -->
+      <button onclick="demanderSuppression('${ing.nom.replace(/'/g, "\\'")}')"
+        class="absolute -top-2 -left-2 w-7 h-7 bg-white shadow-md border border-surface-container-high rounded-full flex items-center justify-center text-on-surface-variant hover:text-error active:scale-90 transition-all z-10">
+        <span class="material-symbols-outlined text-[14px]">close</span>
+      </button>
+
+      <!-- Image / icône -->
+      <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container flex items-center justify-center border border-outline-variant/10">
+        ${ing.image
+          ? `<img src="${ing.image}" alt="${ing.nom}" class="w-full h-full object-cover"/>`
+          : (ing.icone
+              ? `<div class="w-12 h-12 opacity-90">${getIconeSVG(ing.icone)}</div>`
+              : `<span class="material-symbols-outlined text-primary text-2xl opacity-60" style="font-variation-settings:'wght' 200">grocery</span>`
+            )
+        }
+      </div>
+
+      <!-- Infos -->
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-primary text-sm lg:text-base truncate">${ing.nom}</p>
+        <p class="text-on-surface-variant text-xs lg:text-sm mt-0.5">${qteAffichee}</p>
+        <p class="text-secondary font-bold text-sm lg:text-base mt-1">${prixAffiche} MAD</p>
+      </div>
+
+      <!-- Contrôles quantité -->
+      <div class="flex flex-col items-center gap-1.5 bg-surface-container-low rounded-full px-2 py-2 border border-outline-variant/15 flex-shrink-0">
+        <button onclick="augmenterQuantite('${ing.nom.replace(/'/g, "\\'")}', '${ing.type}')"
+          class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white active:scale-90 transition-all text-primary">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+        </button>
+        <span class="font-bold text-primary text-sm min-w-[18px] text-center">${ing.type === 'pack' ? ing.quantitePanier : ing.quantiteRecette}</span>
+        <button onclick="diminuerQuantite('${ing.nom.replace(/'/g, "\\'")}', '${ing.type}')"
+          class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white active:scale-90 transition-all text-primary ${_peutDiminuer(ing) ? '' : 'opacity-30 pointer-events-none'}">
+          <span class="material-symbols-outlined text-[18px]">remove</span>
+        </button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ===== PRIX =====
+function _prixIngredient(ing) {
+  // Si le panier provient du panierController, `prixUnitaire` est déjà calculé
+  // selon les préférences. Sinon, fallback sur l'ancien calcul.
+  let prix;
+  if (ing.prixUnitaire != null) {
+    prix = ing.prixUnitaire;
+  } else {
+    const source = preferences.sourcePreferee || 'mix';
+    if (source === 'souk') prix = ing.prixSouk ?? ing.prix ?? 0;
+    else if (source === 'supermarche') prix = ing.prixSupermarche ?? ing.prix ?? 0;
+    else prix = ((ing.prixSouk ?? ing.prix ?? 0) + (ing.prixSupermarche ?? ing.prix ?? 0)) / 2;
+  }
+
+  if (ing.type === 'pack') return Math.round((ing.quantitePanier ?? 1) * prix);
+  return Math.round((ing.quantiteRecette ?? 0) * prix);
+}
+
+function _peutDiminuer(ing) {
+  if (ing.type === 'pack') return (ing.quantitePanier ?? 1) > 1;
+  return (ing.quantiteRecette ?? 0) > 50;
+}
+
+async function updateTotal() {
+  if (!panierData) return;
+  let total = 0;
+  (panierData.ingredients || []).forEach(ing => { total += _prixIngredient(ing); });
+  // Frais livraison
+  const source = preferences.sourcePreferee || 'mix';
+  const frais = source === 'souk' ? 15 : source === 'supermarche' ? 20 : 17;
+  document.getElementById('prix-total').textContent = `${total} MAD`;
+}
+
+// ===== SUPPRIMER =====
+window.demanderSuppression = function(nom) {
+  ingredientASupprimer = nom;
+  document.getElementById('popup-ing-nom').textContent =
+    `Voulez-vous supprimer "${nom}" de votre panier ?`;
+  document.getElementById('popup-suppression').classList.remove('hidden');
+};
+
+window.fermerPopupSuppression = function() {
+  document.getElementById('popup-suppression').classList.add('hidden');
+  ingredientASupprimer = null;
+};
+
+window.confirmerSuppression = async function() {
+  if (!ingredientASupprimer) return;
+  try {
+    await supprimerIngredient(ingredientASupprimer);
+    panierData = await getPanier();
+    fermerPopupSuppression();
+
+    if (!panierData || !panierData.ingredients || panierData.ingredients.length === 0) {
+      afficherEtatVide();
+    } else {
+      afficherEtatRempli();
+    }
+    showToast('Ingrédient supprimé');
+  } catch (e) {
+    console.error(e);
+    // Fallback localStorage direct
+    _supprimerLocal(ingredientASupprimer);
+    fermerPopupSuppression();
+  }
+};
+
+function _supprimerLocal(nom) {
+  try {
+    const raw = localStorage.getItem('ethniceats_panier');
+    if (!raw) return;
+    const p = JSON.parse(raw);
+    p.ingredients = (p.ingredients || []).filter(i => i.nom !== nom);
+    localStorage.setItem('ethniceats_panier', JSON.stringify(p));
+    panierData = p;
+    if (p.ingredients.length === 0) afficherEtatVide();
+    else afficherEtatRempli();
+    showToast('Ingrédient supprimé');
+  } catch(e) {}
+}
+
+// ===== MODIFIER QUANTITÉ =====
+window.augmenterQuantite = async function(nom, type) {
+  try {
+    const ing = panierData.ingredients.find(i => i.nom === nom);
+    if (!ing) return;
+    if (type === 'pack') {
+      ing.quantitePanier = (ing.quantitePanier ?? 1) + 1;
+    } else {
+      const step = _step(ing);
+      ing.quantiteRecette = Math.round(((ing.quantiteRecette ?? step) + step) * 10) / 10;
+    }
+    await sauvegarderPanier(panierData);
+    renderIngredients();
+    updateTotal();
+  } catch(e) {
+    console.error(e);
+    _augmenterLocal(nom, type);
+  }
+};
+
+window.diminuerQuantite = async function(nom, type) {
+  try {
+    const ing = panierData.ingredients.find(i => i.nom === nom);
+    if (!ing) return;
+    if (type === 'pack') {
+      if ((ing.quantitePanier ?? 1) <= 1) return;
+      ing.quantitePanier = (ing.quantitePanier ?? 1) - 1;
+    } else {
+      const step = _step(ing);
+      const nouv = Math.round(((ing.quantiteRecette ?? step) - step) * 10) / 10;
+      if (nouv <= 0) return;
+      ing.quantiteRecette = nouv;
+    }
+    await sauvegarderPanier(panierData);
+    renderIngredients();
+    updateTotal();
+  } catch(e) {
+    console.error(e);
+  }
+};
+
+function _step(ing) {
+  // Incrément selon l'unité
+  if (ing.unite === 'kg') return 0.1;
+  if (ing.unite === 'ml') return 50;
+  if (ing.unite === 'g') return 50;
+  if (ing.unite === 'l') return 0.1;
+  return 1;
+}
+
+function _augmenterLocal(nom, type) {
+  try {
+    const raw = localStorage.getItem('ethniceats_panier');
+    if (!raw) return;
+    const p = JSON.parse(raw);
+    const ing = (p.ingredients || []).find(i => i.nom === nom);
+    if (!ing) return;
+    if (type === 'pack') ing.quantitePanier = (ing.quantitePanier ?? 1) + 1;
+    else ing.quantiteRecette = (ing.quantiteRecette ?? 100) + 100;
+    localStorage.setItem('ethniceats_panier', JSON.stringify(p));
+    panierData = p;
+    renderIngredients();
+    updateTotal();
+  } catch(e) {}
+}
+
+// ===== CHECKOUT =====
+window.passerCommande = function() {
+  window.location.href = '/checkout';
+};
+
+// ===== PRÉFÉRENCES =====
+function _getPreferences() {
+  try {
+    const raw = localStorage.getItem('ethniceats_preferences');
+    return raw ? JSON.parse(raw) : { sourcePreferee: 'mix', budget: 'moyen', priorite: 'moins_cher' };
+  } catch(e) {
+    return { sourcePreferee: 'mix', budget: 'moyen', priorite: 'moins_cher' };
+  }
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 2200);
+}
+</script>
+
+</body>
+</html>

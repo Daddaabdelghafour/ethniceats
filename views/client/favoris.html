@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Mes favoris</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode:"class",
+    theme:{ extend:{ colors:{
+      "primary":"#012d1d","on-primary":"#ffffff","primary-container":"#1b4332",
+      "primary-fixed":"#c1ecd4","primary-fixed-dim":"#a5d0b9","on-primary-fixed":"#002114",
+      "on-primary-fixed-variant":"#274e3d","on-primary-container":"#86af99","inverse-primary":"#a5d0b9",
+      "secondary":"#775a19","on-secondary":"#ffffff","secondary-container":"#fdd587","on-secondary-container":"#785a19",
+      "secondary-fixed":"#ffdea3","secondary-fixed-dim":"#e8c176","on-secondary-fixed":"#261900",
+      "surface":"#fbf9f8","surface-dim":"#dbdad9","surface-bright":"#fbf9f8",
+      "surface-container-lowest":"#ffffff","surface-container-low":"#f5f3f3",
+      "surface-container":"#efeded","surface-container-high":"#e9e8e7",
+      "surface-container-highest":"#e3e2e2","surface-variant":"#e3e2e2",
+      "on-surface":"#1b1c1c","on-surface-variant":"#414844",
+      "background":"#fbf9f8","outline":"#717973","outline-variant":"#c1c8c2",
+      "error":"#ba1a1a","error-container":"#ffdad6","on-error":"#ffffff","on-error-container":"#93000a",
+      "inverse-surface":"#303030","inverse-on-surface":"#f2f0f0",
+      "tertiary":"#282622","on-tertiary":"#ffffff","tertiary-container":"#3e3b37",
+      "on-tertiary-container":"#aaa59f","surface-tint":"#3f6653",
+    }, borderRadius:{ DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px" },
+    fontFamily:{ headline:["Playfair Display","serif"], body:["Manrope","sans-serif"] }
+    }}
+  }
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  body { font-family:'Manrope',sans-serif; background:#fbf9f8; }
+  h1,h2,h3 { font-family:'Playfair Display',serif; }
+  .sidebar-item { color:#9ca3af; transition:all 0.2s; }
+  .sidebar-item:hover { color:#012d1d; background:rgba(1,45,29,0.05); border-radius:1rem; }
+  .sidebar-item.active { color:#012d1d; font-weight:700; background:rgba(1,45,29,0.07); border-radius:1rem; }
+  .sidebar-item.active .material-symbols-outlined { font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .skeleton { animation:pulse 1.5s ease-in-out infinite; background:#e5e2e1; border-radius:0.75rem; }
+  @keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .fav-card { animation:slideIn 0.25s ease-out both; }
+  .fav-card { transition: opacity 0.25s, transform 0.25s; }
+  .overlay { background:rgba(0,0,0,0.35); backdrop-filter:blur(4px); }
+  .fav-icon-filled { font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24; }
+</style>
+</head>
+<body class="min-h-screen text-on-surface">
+
+<!-- SIDEBAR DESKTOP -->
+<nav class="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col items-start px-4 py-10 gap-2 z-40">
+  <div class="mb-8 px-2"><h1 class="font-headline text-2xl text-primary font-bold">EthnicEats</h1></div>
+  <a href="/accueil" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">home</span>Accueil</a>
+  <a href="/panier" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">shopping_bag</span>Panier</a>
+  <a href="/suivi-commande" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors"><span class="material-symbols-outlined">local_shipping</span>Suivi</a>
+  <a href="/profil-client" class="sidebar-item active flex items-center gap-3 w-full px-4 py-3 rounded-2xl"><span class="material-symbols-outlined">person</span>Profil</a>
+</nav>
+
+<!-- MAIN -->
+<main class="lg:ml-64 min-h-screen flex flex-col">
+
+  <!-- Header fixe -->
+  <header class="sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10 px-5 lg:px-10 h-16 flex items-center gap-4">
+    <a href="/profil-client" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary flex-shrink-0">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <h1 id="page-title" class="font-headline text-xl text-primary font-bold lg:flex-1 lg:text-center lg:pr-10">Favoris</h1>
+  </header>
+
+  <!-- Skeleton -->
+  <div id="skeleton" class="px-5 lg:px-10 pt-6 space-y-4 max-w-2xl lg:mx-auto w-full">
+    <div class="skeleton h-28 w-full"></div>
+    <div class="skeleton h-28 w-full"></div>
+    <div class="skeleton h-28 w-full"></div>
+  </div>
+
+  <!-- État VIDE -->
+  <div id="empty-state" class="hidden flex-1 flex flex-col items-center justify-center text-center px-6 py-12">
+    <div class="relative mb-8">
+      <div class="w-32 h-32 bg-primary-fixed-dim/20 rounded-full flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary-fixed-dim fav-icon-filled" style="font-size:64px">favorite</span>
+      </div>
+    </div>
+    <div class="space-y-3 max-w-xs">
+      <h2 class="font-headline text-2xl text-primary font-bold">Aucune recette enregistrée</h2>
+      <p class="text-on-surface-variant text-sm leading-relaxed">Ajoutez des recettes à vos favoris pour les retrouver ici</p>
+    </div>
+    <a href="/accueil" class="mt-8 w-full max-w-[280px] bg-primary text-on-primary rounded-full py-4 font-semibold text-sm uppercase tracking-widest shadow-xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all text-center block">
+      Explorer les recettes
+    </a>
+    <!-- Déco -->
+    <div class="fixed top-0 right-0 -z-10 opacity-20 pointer-events-none"><div class="w-72 h-72 bg-primary-fixed-dim rounded-full blur-[100px] -mr-28 -mt-28"></div></div>
+    <div class="fixed bottom-0 left-0 -z-10 opacity-10 pointer-events-none"><div class="w-48 h-48 bg-secondary-fixed-dim rounded-full blur-[80px] -ml-16 -mb-16"></div></div>
+  </div>
+
+  <!-- État REMPLI -->
+  <div id="filled-state" class="hidden px-5 lg:px-10 pt-6 pb-10 max-w-2xl lg:mx-auto w-full space-y-4">
+    <!-- Généré JS -->
+  </div>
+
+</main>
+
+<!-- POPUP SUPPRESSION -->
+<div id="popup-suppression" class="hidden fixed inset-0 z-50 overlay flex items-center justify-center px-6">
+  <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+    <h3 class="font-headline text-xl text-primary font-bold mb-2">Supprimer des favoris ?</h3>
+    <p class="text-on-surface-variant text-sm mb-6 leading-relaxed">Voulez-vous retirer cette recette de vos favoris ?</p>
+    <div class="flex gap-3">
+      <button onclick="fermerPopup()" class="flex-1 py-3 rounded-full border border-outline-variant text-on-surface-variant font-semibold text-sm hover:bg-surface-container transition-colors">Annuler</button>
+      <button onclick="confirmerSuppression()" class="flex-1 py-3 rounded-full bg-primary text-on-primary font-semibold text-sm hover:opacity-90 transition-all">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { getFavoris, toggleFavori } from '../../controllers/clientController.js';
+import { getCurrentUser } from '../../services/authService.js';
+import { ajouterFavori } from '../../services/firestoreService.js';
+import { RECETTES } from '../../data/recettes.js';
+
+let clientId = null;
+let estConnecte = false;
+let idASupprimer = null;
+let favData = [];
+
+function _lireIdsFavorisLocal() {
+  try {
+    const raw = localStorage.getItem('favoris');
+    const ids = raw ? JSON.parse(raw) : [];
+    return Array.isArray(ids) ? ids.filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+}
+
+function _ecrireIdsFavorisLocal(ids) {
+  try {
+    const uniques = Array.from(new Set((ids ?? []).filter(Boolean)));
+    localStorage.setItem('favoris', JSON.stringify(uniques));
+  } catch {}
+}
+
+function _hydraterFavoris(ids) {
+  const map = new Map((RECETTES ?? []).map(r => [r.id, r]));
+  const uniques = Array.from(new Set((ids ?? []).filter(Boolean)));
+  return uniques.map(id => map.get(id) ?? ({
+    id,
+    titre: id,
+    categorie: '',
+    image: '',
+    descriptionCourte: '',
+  }));
+}
+
+async function _migrerFavorisLocalVersFirestore() {
+  if (!estConnecte || !clientId) return;
+
+  const localIds = _lireIdsFavorisLocal();
+  if (!localIds.length) return;
+
+  try {
+    const result = await getFavoris(clientId);
+    if (result?.success === false) return;
+    const firestoreIds = Array.isArray(result?.favorisIds) ? result.favorisIds : [];
+    const missing = localIds.filter(id => !firestoreIds.includes(id));
+
+    if (missing.length) {
+      await Promise.all(missing.map(id => ajouterFavori(clientId, id).catch(() => null)));
+    }
+  } catch {
+    // Si Firestore échoue, on garde le mode localStorage.
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const user = await getCurrentUser();
+    if (user?.uid) {
+      clientId = user.uid;
+      estConnecte = true;
+      await _migrerFavorisLocalVersFirestore();
+    }
+    await charger();
+  } catch(e) { console.error('[favoris]', e); charger(); }
+});
+
+async function charger() {
+  try {
+    document.getElementById('skeleton').classList.add('hidden');
+
+    // Si non connecté : on affiche directement les favoris locaux
+    if (!estConnecte || !clientId) {
+      const ids = _lireIdsFavorisLocal();
+      if (!ids.length) { afficherVide(); return; }
+      const favoris = _hydraterFavoris(ids);
+      favData = favoris;
+      afficherFavoris(favoris);
+      return;
+    }
+
+    // Connecté : Firestore est la source de vérité
+    const result = await getFavoris(clientId);
+    if (result?.success === false) throw new Error(result?.message || 'Chargement favoris Firestore impossible');
+    const ids = Array.isArray(result?.favorisIds)
+      ? result.favorisIds
+      : (Array.isArray(result?.favoris) ? result.favoris.map(r => r.id).filter(Boolean) : []);
+
+    _ecrireIdsFavorisLocal(ids); // miroir local pour éviter les incohérences
+
+    const favoris = _hydraterFavoris(ids);
+    favData = favoris;
+    if (!favoris.length) { afficherVide(); return; }
+    afficherFavoris(favoris);
+  } catch(e) {
+    document.getElementById('skeleton').classList.add('hidden');
+    try {
+      const ids = _lireIdsFavorisLocal();
+      if (!ids.length) { afficherVide(); return; }
+      const favoris = _hydraterFavoris(ids);
+      favData = favoris;
+      afficherFavoris(favoris);
+    } catch { afficherVide(); }
+  }
+}
+
+function afficherVide() {
+  document.getElementById('empty-state').classList.remove('hidden');
+  document.getElementById('empty-state').classList.add('flex');
+  document.getElementById('filled-state').classList.add('hidden');
+  document.getElementById('page-title').textContent = 'Favoris';
+}
+
+function afficherFavoris(favoris) {
+  const container = document.getElementById('filled-state');
+  container.innerHTML = '';
+  document.getElementById('page-title').textContent = `Favoris (${favoris.length})`;
+  favoris.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.id = `fav-${r.id}`;
+    card.className = 'fav-card bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 overflow-hidden hover:shadow-md transition-shadow';
+    card.style.animationDelay = `${i * 50}ms`;
+    card.innerHTML = `
+      <div class="p-4 flex gap-4 relative">
+        <!-- Image -->
+        <div class="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container">
+          ${r.image
+            ? `<img src="${r.image}" alt="${r.titre}" class="w-full h-full object-cover"/>`
+            : `<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-outline text-3xl opacity-40" style="font-variation-settings:'wght' 200">restaurant</span></div>`
+          }
+        </div>
+        <!-- Infos -->
+        <div class="flex-1 min-w-0 pr-8 flex flex-col justify-center">
+          <h3 class="font-bold text-sm text-primary uppercase truncate">${r.titre || r.id}</h3>
+          ${r.categorie ? `<p class="text-[10px] text-outline uppercase font-bold mb-1">${r.categorie}</p>` : ''}
+          ${r.descriptionCourte ? `<p class="text-on-surface-variant text-xs leading-snug line-clamp-2">${r.descriptionCourte}</p>` : ''}
+        </div>
+        <!-- Bouton retirer -->
+        <button onclick="demanderSuppression('${r.id}')"
+          class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-error/10 rounded-full transition-colors">
+          <span class="material-symbols-outlined text-primary fav-icon-filled text-[20px] hover:text-error">favorite</span>
+        </button>
+      </div>
+      <!-- Bouton voir recette -->
+      <div class="border-t border-outline-variant/10 px-4 py-3 flex justify-end">
+        <a href="/recette-detail?id=${r.id}" class="text-primary font-semibold text-xs uppercase tracking-wider hover:opacity-70 transition-opacity flex items-center gap-1">
+          Voir la recette <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+        </a>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+  container.classList.remove('hidden');
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('empty-state').classList.remove('flex');
+}
+
+window.demanderSuppression = (id) => {
+  idASupprimer = id;
+  document.getElementById('popup-suppression').classList.remove('hidden');
+};
+
+window.fermerPopup = () => {
+  document.getElementById('popup-suppression').classList.add('hidden');
+  idASupprimer = null;
+};
+
+window.confirmerSuppression = async () => {
+  if (!idASupprimer) return;
+  try {
+    if (estConnecte && clientId) {
+      const res = await toggleFavori(clientId, idASupprimer);
+      const ids = _lireIdsFavorisLocal();
+      if (res?.estFavori === false) {
+        _ecrireIdsFavorisLocal(ids.filter(id => id !== idASupprimer));
+      } else if (res?.estFavori === true) {
+        _ecrireIdsFavorisLocal([...ids, idASupprimer]);
+      } else {
+        _ecrireIdsFavorisLocal(ids.filter(id => id !== idASupprimer));
+      }
+    } else {
+      const ids = _lireIdsFavorisLocal().filter(id => id !== idASupprimer);
+      _ecrireIdsFavorisLocal(ids);
+    }
+  } catch(e) {
+    const ids = _lireIdsFavorisLocal().filter(id => id !== idASupprimer);
+    _ecrireIdsFavorisLocal(ids);
+  }
+  // Animation suppression
+  const card = document.getElementById(`fav-${idASupprimer}`);
+  if (card) { card.style.opacity = '0'; card.style.transform = 'scale(0.95)'; setTimeout(() => card.remove(), 250); }
+  favData = favData.filter(r => r.id !== idASupprimer);
+  fermerPopup();
+  setTimeout(() => {
+    if (!document.getElementById('filled-state').children.length) afficherVide();
+    else document.getElementById('page-title').textContent = `Favoris (${favData.length})`;
+  }, 300);
+};
+</script>
+</body>
+</html>

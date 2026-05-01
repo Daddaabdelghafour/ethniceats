@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>EthnicEats - Mot de passe oublié</title>
+
+  <!-- Google Fonts: Manrope -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "inverse-surface": "#303030",
+            "secondary-fixed-dim": "#e9c176",
+            "on-primary-container": "#86af99",
+            "tertiary-fixed-dim": "#cac6bf",
+            "surface-container": "#f0eded",
+            "on-background": "#1b1c1c",
+            "error-container": "#ffdad6",
+            "on-secondary": "#ffffff",
+            "on-error-container": "#93000a",
+            "primary-fixed": "#c1ecd4",
+            "on-tertiary-container": "#aaa6a0",
+            "surface-bright": "#fcf9f8",
+            "secondary": "#775a19",
+            "error": "#ba1a1a",
+            "surface-container-highest": "#e5e2e1",
+            "primary-fixed-dim": "#a5d0b9",
+            "secondary-container": "#fed488",
+            "on-primary-fixed": "#002114",
+            "inverse-primary": "#a5d0b9",
+            "on-tertiary-fixed-variant": "#484742",
+            "on-secondary-fixed": "#261900",
+            "surface-variant": "#e5e2e1",
+            "tertiary": "#282622",
+            "on-error": "#ffffff",
+            "tertiary-container": "#3e3c37",
+            "surface-container-high": "#eae7e7",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed-variant": "#5d4201",
+            "tertiary-fixed": "#e6e2db",
+            "primary-container": "#1b4332",
+            "outline-variant": "#c1c8c2",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f6f3f2",
+            "on-secondary-container": "#785a1a",
+            "on-primary-fixed-variant": "#274e3d",
+            "secondary-fixed": "#ffdea5",
+            "outline": "#717973",
+            "inverse-on-surface": "#f3f0ef",
+            "background": "#fcf9f8",
+            "on-surface-variant": "#414844",
+            "surface-dim": "#dcd9d9",
+            "on-tertiary-fixed": "#1d1c18",
+            "surface-tint": "#3f6653",
+            "surface": "#fcf9f8",
+            "on-primary": "#ffffff",
+            "primary": "#012d1d",
+            "on-surface": "#1b1c1c"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          fontFamily: {
+            headline: ["Manrope", "sans-serif"],
+            body: ["Manrope", "sans-serif"],
+            label: ["Manrope", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: max(884px, 100dvh);
+    }
+
+    /* Spinner animation */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #ffffff;
+      border-radius: 9999px;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed">
+
+  <!-- TopAppBar -->
+  <header class="w-full top-0 sticky bg-surface z-50 flex items-center justify-between px-6 py-4 h-16">
+    <!-- Flèche retour → login.html -->
+    <button
+      id="btn-retour"
+      aria-label="Retour"
+      class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 flex items-center justify-center"
+    >
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+    </button>
+
+    <!-- Brand -->
+    <h1 class="font-headline font-black tracking-tighter text-primary text-2xl absolute left-1/2 -translate-x-1/2">
+      EthnicEats
+    </h1>
+
+    <div class="w-6"></div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-grow flex flex-col px-6 py-12 max-w-md mx-auto w-full justify-center pb-24">
+
+    <!-- ── État 1 : Formulaire ─────────────────────────────────────────────── -->
+    <div id="vue-formulaire">
+
+      <!-- Header Section -->
+      <div class="mb-12">
+        <h2 class="font-headline font-bold text-[2.5rem] leading-tight tracking-tight text-primary mb-3">
+          Mot de passe oublié
+        </h2>
+        <p class="font-body text-lg text-on-surface-variant">
+          Entrez votre email pour recevoir un lien de réinitialisation.
+        </p>
+      </div>
+
+      <!-- Form -->
+      <div class="flex flex-col gap-6">
+
+        <!-- Email Field -->
+        <div class="flex flex-col">
+          <label class="font-label text-sm font-medium text-on-surface-variant mb-2 ml-1" for="email">
+            Adresse e-mail
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="nom@exemple.com"
+            autocomplete="email"
+            class="w-full bg-surface-container-low text-on-surface px-5 py-4 rounded-md outline-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:bg-surface-container-high focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/40 font-body border-none"
+          />
+          <!-- Error -->
+          <p id="error-email" class="hidden mt-2 ml-1 text-xs font-medium text-error font-label"></p>
+        </div>
+
+        <!-- Global error (from controller) -->
+        <p id="error-global" class="hidden text-sm font-medium text-error font-label text-center -mt-2"></p>
+
+        <!-- Submit Button -->
+        <div class="mt-8">
+          <button
+            id="btn-submit"
+            type="button"
+            class="w-full bg-gradient-to-b from-primary to-primary-container text-on-primary font-headline font-bold text-lg py-4 px-8 rounded-full shadow-[0px_12px_32px_rgba(27,28,28,0.06)] active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:opacity-95 flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            Envoyer le lien
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Link back to login -->
+      <div class="mt-12 text-center">
+        <p class="font-body text-on-surface-variant">
+          Vous vous souvenez de votre mot de passe ?
+          <a
+            href="login.html"
+            class="font-label font-bold text-primary ml-1 hover:text-secondary transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          >
+            Se connecter
+          </a>
+        </p>
+      </div>
+
+    </div>
+    <!-- ── /État 1 ────────────────────────────────────────────────────────── -->
+
+
+    <!-- ── État 2 : Confirmation (caché par défaut) ───────────────────────── -->
+    <div id="vue-confirmation" class="hidden flex flex-col items-center text-center gap-8">
+
+      <!-- Icône succès -->
+      <div class="w-20 h-20 rounded-full bg-primary-fixed flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
+      </div>
+
+      <!-- Message -->
+      <div class="flex flex-col gap-3">
+        <h2 class="font-headline font-bold text-[2rem] leading-tight tracking-tight text-primary">
+          Email envoyé !
+        </h2>
+        <p id="msg-confirmation" class="font-body text-base text-on-surface-variant leading-relaxed">
+          <!-- Rempli dynamiquement -->
+        </p>
+      </div>
+
+      <!-- Retour à la connexion -->
+      <div class="w-full mt-4">
+        <button
+          id="btn-retour-connexion"
+          type="button"
+          class="w-full bg-gradient-to-b from-primary to-primary-container text-on-primary font-headline font-bold text-lg py-4 px-8 rounded-full shadow-[0px_12px_32px_rgba(27,28,28,0.06)] active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:opacity-95 flex items-center justify-center"
+        >
+          Retour à la connexion
+        </button>
+      </div>
+
+    </div>
+    <!-- ── /État 2 ────────────────────────────────────────────────────────── -->
+
+  </main>
+
+  <!-- Controller import -->
+  <script type="module">
+    import { handleMotDePasseOublie } from "../../controllers/authController.js";
+
+    // ── Éléments DOM ──────────────────────────────────────────────────────────
+    const emailInput        = document.getElementById("email");
+    const btnSubmit         = document.getElementById("btn-submit");
+    const btnRetour         = document.getElementById("btn-retour");
+    const btnRetourConnexion = document.getElementById("btn-retour-connexion");
+    const errorEmail        = document.getElementById("error-email");
+    const errorGlobal       = document.getElementById("error-global");
+    const vueFormulaire     = document.getElementById("vue-formulaire");
+    const vueConfirmation   = document.getElementById("vue-confirmation");
+    const msgConfirmation   = document.getElementById("msg-confirmation");
+
+    // ── Navigation ────────────────────────────────────────────────────────────
+    btnRetour.addEventListener("click", () => {
+      window.location.href = "login.html";
+    });
+
+    btnRetourConnexion.addEventListener("click", () => {
+      window.location.href = "login.html";
+    });
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function afficherErreur(el, msg) {
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+
+    function masquerErreur(el) {
+      el.textContent = "";
+      el.classList.add("hidden");
+    }
+
+    function validerEmail(val) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+    }
+
+    // ── Spinner helpers ───────────────────────────────────────────────────────
+    function activerSpinner() {
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = `<span class="spinner"></span>Envoi en cours…`;
+    }
+
+    function désactiverSpinner() {
+      btnSubmit.disabled = false;
+      btnSubmit.innerHTML = "Envoyer le lien";
+    }
+
+    // ── Nettoyage erreur au changement de champ ───────────────────────────────
+    emailInput.addEventListener("input", () => masquerErreur(errorEmail));
+
+    // ── Soumission ────────────────────────────────────────────────────────────
+    btnSubmit.addEventListener("click", async () => {
+      masquerErreur(errorEmail);
+      masquerErreur(errorGlobal);
+
+      const email = emailInput.value.trim();
+
+      // Validation frontend
+      if (!email) {
+        afficherErreur(errorEmail, "L'adresse e-mail est requise.");
+        return;
+      }
+      if (!validerEmail(email)) {
+        afficherErreur(errorEmail, "Veuillez saisir une adresse e-mail valide.");
+        return;
+      }
+
+      activerSpinner();
+
+      try {
+        const résultat = await handleMotDePasseOublie(email);
+
+        if (résultat.success) {
+          // ── Afficher l'état de confirmation ────────────────────────────────
+          msgConfirmation.innerHTML =
+            `Un email de réinitialisation a été envoyé à <strong>${email}</strong>. Vérifiez votre boîte mail et suivez les instructions.`;
+          vueFormulaire.classList.add("hidden");
+          vueConfirmation.classList.remove("hidden");
+        } else {
+          afficherErreur(errorGlobal, résultat.erreur || "Une erreur est survenue. Veuillez réessayer.");
+          désactiverSpinner();
+        }
+
+      } catch (err) {
+        afficherErreur(errorGlobal, "Une erreur inattendue est survenue. Veuillez réessayer.");
+        console.error("[mot-de-passe-oublie.html]", err);
+        désactiverSpinner();
+      }
+    });
+
+    // ── Soumission via Entrée ─────────────────────────────────────────────────
+    emailInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") btnSubmit.click();
+    });
+  </script>
+
+</body>
+</html>

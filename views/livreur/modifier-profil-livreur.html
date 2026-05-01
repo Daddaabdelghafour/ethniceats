@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Modifier le profil</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode:"class",
+    theme:{ extend:{ colors:{
+      "primary":"#012d1d","on-primary":"#ffffff","primary-container":"#1b4332",
+      "primary-fixed":"#c1ecd4","primary-fixed-dim":"#a5d0b9","on-primary-fixed":"#002114",
+      "on-primary-fixed-variant":"#274e3d","on-primary-container":"#86af99","inverse-primary":"#a5d0b9",
+      "secondary":"#775a19","on-secondary":"#ffffff","secondary-container":"#fdd587",
+      "surface":"#fbf9f8","surface-container-lowest":"#ffffff","surface-container-low":"#f5f3f3",
+      "surface-container":"#efeded","surface-container-high":"#e9e8e7","surface-variant":"#e3e2e2",
+      "on-surface":"#1b1c1c","on-surface-variant":"#414844",
+      "background":"#fbf9f8","outline":"#717973","outline-variant":"#c1c8c2",
+      "error":"#ba1a1a","on-error":"#ffffff","inverse-surface":"#303030",
+      "tertiary":"#282622","on-tertiary":"#ffffff","secondary-fixed-dim":"#e8c176",
+    }, borderRadius:{ DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px" },
+    fontFamily:{ headline:["Playfair Display","serif"], body:["Manrope","sans-serif"] }
+    }}
+  }
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  body { font-family:'Manrope',sans-serif; }
+  h1,h2,h3 { font-family:'Playfair Display',serif; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .skeleton { animation:pulse 1.5s ease-in-out infinite; background:#e5e2e1; border-radius:0.75rem; }
+  .bg-glass { backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+  .field-input {
+    width:100%; background:#f5f3f3; border:none; border-radius:0.75rem;
+    padding:14px 16px; font-size:14px; font-family:'Manrope',sans-serif;
+    outline:none; transition:box-shadow 0.2s; color:#1b1c1c;
+  }
+  .field-input:focus { box-shadow:0 0 0 1.5px #a5d0b9; }
+  .field-label { font-size:11px; font-weight:700; color:#414844; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; display:block; }
+  .msg-ok  { display:none; color:#1b6b40; font-size:13px; font-weight:600; }
+  .msg-err { display:none; color:#ba1a1a; font-size:13px; font-weight:600; }
+</style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+
+<!-- Top bar — même style que modifier-profil-client.html -->
+<header class="sticky top-0 z-50 bg-surface/80 bg-glass border-b border-outline-variant/20 h-16 px-5 flex items-center gap-4 lg:justify-center relative">
+  <button onclick="history.back()" class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center hover:bg-surface-container transition-colors active:scale-95 lg:absolute lg:left-5">
+    <span class="material-symbols-outlined text-primary">arrow_back</span>
+  </button>
+  <h1 class="font-headline text-2xl text-primary font-bold whitespace-nowrap">Modifier le profil</h1>
+</header>
+
+<!-- Skeleton -->
+<div id="skeleton" class="px-5 lg:px-10 max-w-lg lg:mx-auto mt-8 space-y-4">
+  <div class="skeleton h-12 w-full rounded-xl"></div>
+  <div class="skeleton h-12 w-full rounded-xl"></div>
+  <div class="skeleton h-12 w-full rounded-xl"></div>
+</div>
+
+<!-- Form -->
+<main id="form-content" class="hidden px-5 lg:px-10 max-w-lg lg:mx-auto pt-6 pb-12">
+
+  <!-- ── Informations personnelles ── -->
+  <section class="space-y-4 mb-8">
+    <h2 class="font-headline text-xl text-primary font-bold mb-4">Informations personnelles</h2>
+
+    <div>
+      <label class="field-label" for="field-nom">Nom complet</label>
+      <input class="field-input" id="field-nom" type="text" placeholder="Votre nom complet"/>
+    </div>
+    <div>
+      <label class="field-label" for="field-email">Email</label>
+      <input class="field-input" id="field-email" type="email" placeholder="votre@email.com"/>
+    </div>
+    <!-- Numéro de contact — champ supplémentaire pour le livreur -->
+    <div>
+      <label class="field-label" for="field-telephone">Numéro de contact <span class="normal-case font-normal text-on-surface-variant">(visible par les clients)</span></label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" style="font-size:18px;">phone</span>
+        <input class="field-input" style="padding-left:42px;" id="field-telephone" type="tel" placeholder="+212 6XX XXX XXX"/>
+      </div>
+      <p class="text-xs text-on-surface-variant mt-1.5 ml-1">Affiché lors de vos livraisons — obligatoire</p>
+    </div>
+
+    <p id="err-infos" class="msg-err"></p>
+    <p id="ok-infos"  class="msg-ok">✓ Modifications enregistrées</p>
+
+    <button id="btn-sauvegarder" onclick="sauvegarderInfos()"
+      class="w-full bg-primary text-on-primary py-4 rounded-2xl font-semibold text-sm uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all mt-2">
+      Enregistrer les modifications
+    </button>
+  </section>
+
+  <!-- ── Mot de passe ── -->
+  <section class="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-5 space-y-4">
+    <h2 class="font-headline text-xl text-primary font-bold">Modifier le mot de passe</h2>
+
+    <div>
+      <label class="field-label" for="field-mdp-ancien">Mot de passe actuel</label>
+      <div class="relative">
+        <input class="field-input pr-12" id="field-mdp-ancien" type="password" placeholder="••••••••"/>
+        <button type="button" onclick="togglePassword('field-mdp-ancien', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center">
+          <span class="material-symbols-outlined" style="font-size:20px;">visibility_off</span>
+        </button>
+      </div>
+    </div>
+    <div>
+      <label class="field-label" for="field-mdp-nouveau">Nouveau mot de passe</label>
+      <div class="relative">
+        <input class="field-input pr-12" id="field-mdp-nouveau" type="password" placeholder="••••••••"/>
+        <button type="button" onclick="togglePassword('field-mdp-nouveau', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center">
+          <span class="material-symbols-outlined" style="font-size:20px;">visibility_off</span>
+        </button>
+      </div>
+    </div>
+    <div>
+      <label class="field-label" for="field-mdp-confirm">Confirmer le nouveau mot de passe</label>
+      <div class="relative">
+        <input class="field-input pr-12" id="field-mdp-confirm" type="password" placeholder="••••••••"/>
+        <button type="button" onclick="togglePassword('field-mdp-confirm', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center">
+          <span class="material-symbols-outlined" style="font-size:20px;">visibility_off</span>
+        </button>
+      </div>
+    </div>
+
+    <p id="err-mdp" class="msg-err"></p>
+    <p id="ok-mdp"  class="msg-ok">✓ Mot de passe modifié</p>
+
+    <button onclick="sauvegarderMdp()"
+      class="w-full border-2 border-primary/30 text-primary py-3.5 rounded-2xl font-semibold text-sm uppercase tracking-wider hover:bg-primary-fixed/30 transition-colors">
+      Enregistrer le mot de passe
+    </button>
+  </section>
+</main>
+
+<script type="module">
+import { handleModifierProfil, handleModifierMotDePasse, protegerPage } from '../../controllers/authController.js';
+import { getProfil } from '../../controllers/livreurController.js';
+import { getCurrentUser } from '../../services/authService.js';
+
+let livreurId = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // await protegerPage('livreur'); // BYPASS TEST
+  try {
+    const user  = await getCurrentUser();
+    if (user?.uid) livreurId = user.uid;
+    const profil = await getProfil(livreurId);
+    document.getElementById('field-nom').value       = profil.nomComplet || '';
+    document.getElementById('field-email').value     = profil.email || '';
+    document.getElementById('field-telephone').value = profil.telephoneContact || '';
+    
+    // Pré-remplir l'ancien mot de passe (soit depuis le profil si présent en test, soit '123456' par défaut)
+    document.getElementById('field-mdp-ancien').value = profil.motDePasse || '123456';
+  } catch(e) { console.error('[modifier-profil-livreur]', e); }
+  document.getElementById('skeleton').classList.add('hidden');
+  document.getElementById('form-content').classList.remove('hidden');
+});
+
+window.sauvegarderInfos = async () => {
+  const nom       = document.getElementById('field-nom').value.trim();
+  const email     = document.getElementById('field-email').value.trim();
+  const telephone = document.getElementById('field-telephone').value.trim();
+  _hideMsg('err-infos'); _hideMsg('ok-infos');
+
+  if (!nom)       { _showErr('err-infos', 'Le nom est obligatoire'); return; }
+  if (!email || !email.includes('@')) { _showErr('err-infos', 'Email invalide'); return; }
+  if (!telephone) { _showErr('err-infos', 'Le numéro de contact est obligatoire'); return; }
+
+  const btn = document.getElementById('btn-sauvegarder');
+  btn.disabled = true; btn.textContent = 'Enregistrement…';
+  try {
+    // Modifier nom + email via authService (même logique que modifier-profil-client)
+    const resInfo = await handleModifierProfil(livreurId, { nomComplet: nom, email });
+    // Modifier téléphone via authService (champ telephoneContact)
+    const resTel  = await handleModifierProfil(livreurId, { telephoneContact: telephone });
+    if (resInfo?.success !== false && resTel?.success !== false) {
+      document.getElementById('ok-infos').style.display = 'block';
+    } else {
+      _showErr('err-infos', resInfo?.message || resTel?.message || 'Erreur');
+    }
+  } catch(e) { _showErr('err-infos', 'Erreur réseau'); }
+  finally { btn.disabled = false; btn.textContent = 'Enregistrer les modifications'; }
+};
+
+window.sauvegarderMdp = async () => {
+  const ancien  = document.getElementById('field-mdp-ancien').value;
+  const nouveau = document.getElementById('field-mdp-nouveau').value;
+  const confirm = document.getElementById('field-mdp-confirm').value;
+  _hideMsg('err-mdp'); _hideMsg('ok-mdp');
+
+  if (!ancien || !nouveau || !confirm) { _showErr('err-mdp', 'Veuillez remplir tous les champs'); return; }
+  if (nouveau !== confirm) { _showErr('err-mdp', 'Les mots de passe ne correspondent pas'); return; }
+  if (nouveau.length < 6)  { _showErr('err-mdp', 'Minimum 6 caractères'); return; }
+
+  try {
+    const result = await handleModifierMotDePasse(ancien, nouveau, confirm);
+    if (result?.success !== false) {
+      document.getElementById('ok-mdp').style.display = 'block';
+      document.getElementById('field-mdp-ancien').value = '';
+      document.getElementById('field-mdp-nouveau').value = '';
+      document.getElementById('field-mdp-confirm').value = '';
+    } else {
+      _showErr('err-mdp', result?.message || 'Erreur');
+    }
+  } catch(e) { _showErr('err-mdp', 'Erreur réseau'); }
+};
+
+function _showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+}
+function _hideMsg(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'none';
+}
+
+window.togglePassword = function(id, btn) {
+  const input = document.getElementById(id);
+  const icon = btn.querySelector('.material-symbols-outlined');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.textContent = 'visibility';
+  } else {
+    input.type = 'password';
+    icon.textContent = 'visibility_off';
+  }
+};
+</script>
+</body>
+</html>

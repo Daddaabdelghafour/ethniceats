@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EthnicEats — Commande</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#012d1d",
+          "on-primary": "#ffffff",
+          "primary-container": "#1b4332",
+          "primary-fixed": "#c1ecd4",
+          "primary-fixed-dim": "#a5d0b9",
+          "on-primary-fixed": "#002114",
+          "on-primary-fixed-variant": "#274e3d",
+          "on-primary-container": "#86af99",
+          "inverse-primary": "#a5d0b9",
+          "secondary": "#775a19",
+          "on-secondary": "#ffffff",
+          "secondary-container": "#fdd587",
+          "on-secondary-container": "#785a19",
+          "secondary-fixed": "#ffdea3",
+          "secondary-fixed-dim": "#e8c176",
+          "on-secondary-fixed": "#261900",
+          "on-secondary-fixed-variant": "#5c4200",
+          "surface": "#fbf9f8",
+          "surface-dim": "#dbdad9",
+          "surface-bright": "#fbf9f8",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-low": "#f5f3f3",
+          "surface-container": "#efeded",
+          "surface-container-high": "#e9e8e7",
+          "surface-container-highest": "#e3e2e2",
+          "surface-variant": "#e3e2e2",
+          "on-surface": "#1b1c1c",
+          "on-surface-variant": "#414844",
+          "background": "#fbf9f8",
+          "on-background": "#1b1c1c",
+          "outline": "#717973",
+          "outline-variant": "#c1c8c2",
+          "error": "#ba1a1a",
+          "error-container": "#ffdad6",
+          "on-error": "#ffffff",
+          "on-error-container": "#93000a",
+          "inverse-surface": "#303030",
+          "inverse-on-surface": "#f2f0f0",
+          "tertiary": "#282622",
+          "on-tertiary": "#ffffff",
+          "tertiary-container": "#3e3b37",
+          "on-tertiary-container": "#aaa59f",
+          "surface-tint": "#3f6653",
+        },
+        borderRadius: {
+          DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"
+        },
+        fontFamily: {
+          headline: ["Playfair Display", "serif"],
+          body: ["Manrope", "sans-serif"],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  body { font-family: 'Manrope', sans-serif; background: #fbf9f8; color: #1b1c1c; }
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+  /* Sidebar */
+  .sidebar-item { color: #9ca3af; transition: all 0.2s; }
+  .sidebar-item:hover { color: #012d1d; background: rgba(1,45,29,0.05); border-radius: 1rem; }
+  .sidebar-item.active { color: #012d1d; font-weight: 700; background: rgba(1,45,29,0.07); border-radius: 1rem; }
+  .sidebar-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+
+  /* Input focus */
+  .field-input { transition: border-color 0.2s, box-shadow 0.2s; }
+  .field-input:focus { outline: none; border-color: #012d1d; box-shadow: 0 0 0 3px rgba(1,45,29,0.08); }
+
+  /* Radio option sélectionnée */
+  .payment-option { transition: all 0.2s; cursor: pointer; }
+  .payment-option.selected { border-color: #012d1d; background: rgba(1,45,29,0.04); }
+
+  /* Overlay popup */
+  .overlay { background: rgba(0,0,0,0.4); backdrop-filter: blur(6px); }
+
+  /* Skeleton */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .skeleton { animation: pulse 1.5s ease-in-out infinite; background: #e5e2e1; border-radius: 0.75rem; }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Card form slide */
+  #card-form { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  #card-form.open { max-height: 400px; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ===== SIDEBAR DESKTOP ===== -->
+<nav class="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant/20 flex-col items-start px-4 py-10 gap-2 z-40">
+  <div class="mb-8 px-2">
+    <h1 class="font-headline text-2xl text-primary font-bold">EthnicEats</h1>
+  </div>
+  <a href="/accueil" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">home</span>Accueil
+  </a>
+  <a href="/panier" class="sidebar-item active flex items-center gap-3 w-full px-4 py-3 rounded-2xl">
+    <span class="material-symbols-outlined">shopping_bag</span>Panier
+  </a>
+  <a href="/suivi-commande" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">local_shipping</span>Suivi
+  </a>
+  <a href="/profil-client" class="sidebar-item flex items-center gap-3 w-full px-4 py-3 rounded-2xl text-on-surface-variant hover:bg-surface-container transition-colors">
+    <span class="material-symbols-outlined">person</span>Profil
+  </a>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<main class="lg:ml-64 min-h-screen pb-36">
+
+  <!-- Header fixe -->
+  <header class="sticky top-0 z-30 bg-surface/90 backdrop-blur-md border-b border-outline-variant/10 px-5 lg:px-10 h-16 flex items-center gap-4">
+    <a href="/panier" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary flex-shrink-0">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <h1 class="font-headline text-xl text-primary font-bold">Commande</h1>
+  </header>
+
+  <!-- Skeleton loading -->
+  <div id="skeleton" class="px-5 lg:px-10 pt-6 space-y-6 max-w-3xl">
+    <div class="skeleton h-8 w-48 rounded-xl"></div>
+    <div class="skeleton h-32 w-full rounded-2xl"></div>
+    <div class="skeleton h-8 w-48 rounded-xl"></div>
+    <div class="skeleton h-40 w-full rounded-2xl"></div>
+    <div class="skeleton h-8 w-48 rounded-xl"></div>
+    <div class="skeleton h-28 w-full rounded-2xl"></div>
+  </div>
+
+  <!-- Contenu checkout -->
+  <div id="checkout-content" class="hidden px-5 lg:px-10 pt-6 max-w-3xl space-y-8">
+
+    <!-- ① RÉSUMÉ COMMANDE -->
+    <section>
+      <h2 class="font-headline text-xl text-primary font-bold mb-4">Résumé de la commande</h2>
+      <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/15 overflow-hidden shadow-sm">
+        <ul id="ingredients-summary" class="divide-y divide-outline-variant/10">
+          <!-- Généré JS -->
+        </ul>
+      </div>
+    </section>
+
+    <!-- ② ADRESSE LIVRAISON -->
+    <section>
+      <h2 class="font-headline text-xl text-primary font-bold mb-4">Adresse de livraison</h2>
+      <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/15 p-5 shadow-sm space-y-4">
+        <div class="space-y-1.5">
+          <label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Adresse complète</label>
+          <input id="field-adresse" type="text" placeholder="Ex : 12 Rue Al Massira, Guéliz"
+            class="field-input w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium placeholder:text-outline placeholder:font-normal"/>
+          <p id="err-adresse" class="hidden text-error text-xs mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>Ce champ est requis</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Ville</label>
+            <input id="field-ville" type="text" placeholder="Ex : Marrakech"
+              class="field-input w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium placeholder:text-outline placeholder:font-normal"/>
+            <p id="err-ville" class="hidden text-error text-xs mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>Ce champ est requis</p>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Téléphone</label>
+            <input id="field-tel" type="tel" placeholder="Ex : 0612345678"
+              class="field-input w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium placeholder:text-outline placeholder:font-normal"/>
+            <p id="err-tel" class="hidden text-error text-xs mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">error</span>Numéro invalide</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③ MODE DE PAIEMENT -->
+    <section>
+      <h2 class="font-headline text-xl text-primary font-bold mb-4">Mode de paiement</h2>
+      <div class="space-y-3">
+        <!-- Livraison -->
+        <div class="payment-option selected flex items-center gap-4 p-4 bg-surface-container-lowest rounded-2xl border-2 border-primary/30 shadow-sm"
+             onclick="selectPaiement('livraison')" id="opt-livraison">
+          <div class="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center flex-shrink-0" id="radio-livraison">
+            <div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+          </div>
+          <span class="material-symbols-outlined text-primary text-xl">local_shipping</span>
+          <div>
+            <p class="font-bold text-primary text-sm">Paiement à la livraison</p>
+            <p class="text-on-surface-variant text-xs mt-0.5">Payez en espèces à la réception</p>
+          </div>
+        </div>
+        <!-- Carte -->
+        <div class="payment-option flex items-center gap-4 p-4 bg-surface-container-lowest rounded-2xl border-2 border-outline-variant/20 shadow-sm"
+             onclick="selectPaiement('carte')" id="opt-carte">
+          <div class="w-5 h-5 rounded-full border-2 border-outline-variant flex items-center justify-center flex-shrink-0" id="radio-carte">
+            <div class="w-2.5 h-2.5 rounded-full bg-primary hidden"></div>
+          </div>
+          <span class="material-symbols-outlined text-on-surface-variant text-xl">credit_card</span>
+          <div>
+            <p class="font-bold text-on-surface text-sm">Carte bancaire</p>
+            <p class="text-on-surface-variant text-xs mt-0.5">Paiement sécurisé par carte</p>
+          </div>
+        </div>
+
+        <!-- Formulaire carte (slide) -->
+        <div id="card-form">
+          <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/15 p-5 shadow-sm space-y-4 mt-2">
+            <div class="space-y-1.5">
+              <label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Numéro de carte</label>
+              <div class="relative">
+                <input id="field-carte" type="text" placeholder="0000 0000 0000 0000" maxlength="19"
+                  class="field-input w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium placeholder:text-outline placeholder:font-normal"/>
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant text-xl">credit_card</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Expiration</label>
+                <input id="field-expiry" type="text" placeholder="MM/AA" maxlength="5"
+                  class="field-input w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium placeholder:text-outline placeholder:font-normal"/>
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">CVV</label>
+                <input id="field-cvv" type="password" placeholder="•••" maxlength="4"
+                  class="field-input w-full px-4 py-3 bg-surface-container-low border border-outline-variant/30 rounded-xl text-sm font-medium placeholder:text-outline placeholder:font-normal"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ DÉTAILS PRIX -->
+    <section>
+      <div class="bg-primary/5 rounded-2xl p-5 border border-primary/10">
+        <h2 class="font-headline text-xl text-primary font-bold mb-4">Détails du paiement</h2>
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm">
+            <span class="text-on-surface-variant">Sous-total</span>
+            <span id="recap-sous-total" class="font-semibold text-on-surface">— MAD</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-on-surface-variant">Frais de livraison</span>
+            <span id="recap-frais" class="font-semibold text-on-surface">— MAD</span>
+          </div>
+          <div class="pt-3 border-t border-primary/10 flex justify-between items-baseline">
+            <span class="font-headline text-lg text-primary font-bold">Total</span>
+            <span id="recap-total" class="font-headline text-2xl text-primary font-bold">— MAD</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Panier vide redirect -->
+  <div id="empty-state" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+    <span class="material-symbols-outlined text-6xl text-outline mb-4" style="font-variation-settings:'wght' 200">shopping_bag</span>
+    <p class="text-on-surface-variant text-lg font-medium mb-4">Votre panier est vide</p>
+    <a href="/accueil" class="bg-primary text-on-primary rounded-full px-6 py-3 font-semibold text-sm">Explorer les recettes</a>
+  </div>
+
+</main>
+
+<!-- ===== BARRE FIXE BAS ===== -->
+<div id="bottom-bar" class="hidden fixed bottom-0 left-0 lg:left-64 right-0 z-30 bg-white/95 backdrop-blur-lg border-t border-outline-variant/15 rounded-t-[2rem] shadow-[0_-8px_30px_rgba(1,45,29,0.08)]">
+  <div class="px-6 lg:px-10 pt-4 pb-7 flex flex-col items-center gap-2">
+    <p id="total-label" class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Total à payer : — MAD</p>
+    <button id="submit-btn" onclick="soumettre()"
+      class="w-full max-w-[380px] bg-primary text-on-primary rounded-full py-4 font-semibold text-sm uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl shadow-primary/15 hover:opacity-90 active:scale-[0.98] transition-all">
+      <span class="material-symbols-outlined text-[18px]">check_circle</span>
+      <span id="submit-label">Valider la commande</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== POPUP CONFIRMATION ===== -->
+<div id="popup-confirmation" class="hidden fixed inset-0 z-50 overlay flex items-center justify-center px-6">
+  <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden">
+    <!-- En-tête verte -->
+    <div class="h-36 bg-primary flex items-center justify-center relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10">
+        <div class="w-full h-full" style="background: repeating-linear-gradient(45deg, #a5d0b9 0px, #a5d0b9 2px, transparent 2px, transparent 20px)"></div>
+      </div>
+      <div class="relative z-10 w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl">
+        <span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings:'FILL' 1,'wght' 400">check_circle</span>
+      </div>
+    </div>
+    <!-- Corps -->
+    <div class="p-7 text-center">
+      <h3 class="font-headline text-2xl text-primary font-bold mb-2">Commande confirmée !</h3>
+      <p class="text-on-surface-variant text-sm mb-2 leading-relaxed">Votre commande a été passée avec succès.</p>
+      <p id="popup-commande-id" class="text-primary font-bold text-sm mb-7"></p>
+      <div class="space-y-3">
+        <a href="/suivi-commande"
+          class="block w-full bg-primary text-on-primary rounded-full py-4 font-semibold text-sm uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all text-center">
+          <span class="flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+            Suivre ma commande
+          </span>
+        </a>
+        <a href="/accueil"
+          class="block w-full py-3 rounded-full border border-outline-variant text-on-surface-variant font-semibold text-sm hover:bg-surface-container transition-colors text-center">
+          Choisir une autre recette
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ERREUR ===== -->
+<div id="toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-error text-on-error px-5 py-3 rounded-full text-sm font-semibold shadow-xl whitespace-nowrap"></div>
+
+<script type="module">
+import { getPanierPourCheckout, viderPanier } from '../../controllers/panierController.js';
+import { creerCommande } from '../../controllers/commandeController.js';
+import { getCurrentUser } from '../../services/authService.js';
+import { getIconeSVG } from '../../services/ingredientIcons.js';
+
+// ===== ÉTAT =====
+let panierCheckout = null;
+let modePaiement = 'livraison'; // 'livraison' | 'carte'
+const preferences = _getPrefs();
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    panierCheckout = await getPanierPourCheckout();
+    document.getElementById('skeleton').classList.add('hidden');
+
+    if (!panierCheckout || !panierCheckout.ingredients || panierCheckout.ingredients.length === 0) {
+      document.getElementById('empty-state').classList.remove('hidden');
+      document.getElementById('empty-state').classList.add('flex');
+      return;
+    }
+
+    document.getElementById('checkout-content').classList.remove('hidden');
+    document.getElementById('bottom-bar').classList.remove('hidden');
+
+    renderIngredients();
+    renderPrix();
+    setupCardInputs();
+
+  } catch (e) {
+    console.error('[checkout]', e);
+    document.getElementById('skeleton').classList.add('hidden');
+    document.getElementById('empty-state').classList.remove('hidden');
+    document.getElementById('empty-state').classList.add('flex');
+  }
+});
+
+// ===== RENDER INGRÉDIENTS =====
+function renderIngredients() {
+  const ul = document.getElementById('ingredients-summary');
+  ul.innerHTML = (panierCheckout.ingredients || []).map(ing => {
+    const qte = ing.type === 'pack'
+      ? `× ${ing.quantitePanier} pack${(ing.quantitePanier ?? 1) > 1 ? 's' : ''}`
+      : `× ${ing.quantiteRecette} ${ing.unite}`;
+    const prix = _prixIng(ing);
+    return `
+      <li class="flex items-center justify-between px-5 py-3.5">
+        <div class="flex items-center gap-3 min-w-0">
+          ${ing.image
+            ? `<img src="${ing.image}" alt="${ing.nom}" class="w-10 h-10 rounded-xl object-cover flex-shrink-0 border border-outline-variant/10"/>`
+            : (ing.icone
+                ? `<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center flex-shrink-0 border border-outline-variant/10"><div class="w-7 h-7 opacity-90">${getIconeSVG(ing.icone)}</div></div>`
+                : `<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-primary text-lg opacity-50" style="font-variation-settings:'wght' 200">grocery</span></div>`
+              )
+          }
+          <div class="min-w-0">
+            <p class="font-semibold text-on-surface text-sm truncate">${ing.nom}</p>
+            <p class="text-on-surface-variant text-xs">${qte}</p>
+          </div>
+        </div>
+        <p class="font-bold text-primary text-sm flex-shrink-0 ml-4">${prix} MAD</p>
+      </li>`;
+  }).join('');
+}
+
+// ===== RENDER PRIX =====
+function renderPrix() {
+  // Par défaut, on s'appuie sur les totaux calculés par panierController.
+  // Ça évite de recalculer côté UI avec une logique de prix différente.
+  let sousTotal = typeof panierCheckout.sousTotal === 'number'
+    ? panierCheckout.sousTotal
+    : 0;
+
+  let frais = typeof panierCheckout.fraisLivraison === 'number'
+    ? panierCheckout.fraisLivraison
+    : 0;
+
+  if (!sousTotal && (panierCheckout.ingredients || []).length) {
+    (panierCheckout.ingredients || []).forEach(ing => { sousTotal += _prixIng(ing); });
+  }
+
+  if (!frais) {
+    const source = preferences.sourcePreferee || 'mix';
+    frais = source === 'souk' ? 15 : source === 'supermarche' ? 20 : 17;
+  }
+
+  const total = typeof panierCheckout.total === 'number'
+    ? panierCheckout.total
+    : (sousTotal + frais);
+
+  document.getElementById('recap-sous-total').textContent = `${sousTotal} MAD`;
+  document.getElementById('recap-frais').textContent = `${frais} MAD`;
+  document.getElementById('recap-total').textContent = `${total} MAD`;
+  document.getElementById('total-label').textContent = `Total à payer : ${total} MAD`;
+
+  // Stocker pour soumission
+  window._sousTotal = sousTotal;
+  window._fraisLivraison = frais;
+  window._total = total;
+}
+
+function _prixIng(ing) {
+  // Si le panier provient du panierController, `prixTotal` et `prixUnitaire` sont fiables.
+  if (typeof ing.prixTotal === 'number') return Math.round(ing.prixTotal);
+
+  let prixUnitaire;
+  if (ing.prixUnitaire != null) {
+    prixUnitaire = ing.prixUnitaire;
+  } else {
+    const source = preferences.sourcePreferee || 'mix';
+    if (source === 'souk') prixUnitaire = ing.prixSouk ?? ing.prix ?? 0;
+    else if (source === 'supermarche') prixUnitaire = ing.prixSupermarche ?? ing.prix ?? 0;
+    else prixUnitaire = ((ing.prixSouk ?? ing.prix ?? 0) + (ing.prixSupermarche ?? ing.prix ?? 0)) / 2;
+  }
+
+  if (ing.type === 'pack') return Math.round((ing.quantitePanier ?? 1) * prixUnitaire);
+  return Math.round((ing.quantiteRecette ?? 0) * prixUnitaire);
+}
+
+// ===== PAIEMENT =====
+window.selectPaiement = function(mode) {
+  modePaiement = mode;
+
+  // Reset les deux options
+  const optLiv = document.getElementById('opt-livraison');
+  const optCarte = document.getElementById('opt-carte');
+  const radioLiv = document.getElementById('radio-livraison');
+  const radioCarte = document.getElementById('radio-carte');
+  const cardForm = document.getElementById('card-form');
+  const submitLabel = document.getElementById('submit-label');
+
+  if (mode === 'livraison') {
+    optLiv.classList.add('selected', 'border-primary/30');
+    optLiv.classList.remove('border-outline-variant/20');
+    optCarte.classList.remove('selected', 'border-primary/30');
+    optCarte.classList.add('border-outline-variant/20');
+    radioLiv.classList.add('border-primary');
+    radioLiv.classList.remove('border-outline-variant');
+    radioLiv.querySelector('div').classList.remove('hidden');
+    radioCarte.classList.remove('border-primary');
+    radioCarte.classList.add('border-outline-variant');
+    radioCarte.querySelector('div').classList.add('hidden');
+    cardForm.classList.remove('open');
+    submitLabel.textContent = 'Valider la commande';
+    document.getElementById('submit-btn').querySelector('.material-symbols-outlined').textContent = 'check_circle';
+  } else {
+    optCarte.classList.add('selected', 'border-primary/30');
+    optCarte.classList.remove('border-outline-variant/20');
+    optLiv.classList.remove('selected', 'border-primary/30');
+    optLiv.classList.add('border-outline-variant/20');
+    radioCarte.classList.add('border-primary');
+    radioCarte.classList.remove('border-outline-variant');
+    radioCarte.querySelector('div').classList.remove('hidden');
+    radioLiv.classList.remove('border-primary');
+    radioLiv.classList.add('border-outline-variant');
+    radioLiv.querySelector('div').classList.add('hidden');
+    cardForm.classList.add('open');
+    submitLabel.textContent = 'Payer';
+    document.getElementById('submit-btn').querySelector('.material-symbols-outlined').textContent = 'lock';
+  }
+};
+
+// ===== FORMATAGE CARTE =====
+function setupCardInputs() {
+  const carte = document.getElementById('field-carte');
+  const expiry = document.getElementById('field-expiry');
+
+  carte?.addEventListener('input', e => {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 16);
+    e.target.value = v.replace(/(.{4})/g, '$1 ').trim();
+  });
+  expiry?.addEventListener('input', e => {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 4);
+    if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
+    e.target.value = v;
+  });
+}
+
+// ===== VALIDATION FORMULAIRE =====
+function validerFormulaire() {
+  let ok = true;
+
+  const adresse = document.getElementById('field-adresse').value.trim();
+  const ville = document.getElementById('field-ville').value.trim();
+  const tel = document.getElementById('field-tel').value.trim();
+
+  // Adresse
+  _toggleError('err-adresse', !adresse);
+  _toggleError('err-ville', !ville);
+  const telOk = /^[0-9]{9,10}$/.test(tel.replace(/\s/g, ''));
+  _toggleError('err-tel', !telOk);
+
+  if (!adresse || !ville || !telOk) ok = false;
+
+  // Carte si sélectionnée
+  if (modePaiement === 'carte') {
+    const numCarte = document.getElementById('field-carte').value.replace(/\s/g, '');
+    const expiry = document.getElementById('field-expiry').value;
+    const cvv = document.getElementById('field-cvv').value;
+    if (numCarte.length < 16 || !expiry.includes('/') || cvv.length < 3) {
+      showToast('Veuillez compléter les informations de carte');
+      ok = false;
+    }
+  }
+
+  return ok;
+}
+
+function _toggleError(id, show) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (show) el.classList.remove('hidden');
+  else el.classList.add('hidden');
+  // bordure rouge sur l'input parent
+  const input = el.previousElementSibling;
+  if (input && input.tagName === 'INPUT') {
+    if (show) input.classList.add('border-error');
+    else input.classList.remove('border-error');
+  }
+}
+
+// ===== SOUMETTRE =====
+window.soumettre = async function() {
+  if (!validerFormulaire()) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>Traitement...</span>`;
+
+  try {
+    const adresse = {
+      adresse: document.getElementById('field-adresse').value.trim(),
+      ville: document.getElementById('field-ville').value.trim(),
+      telephone: document.getElementById('field-tel').value.trim(),
+    };
+
+    let clientId = 'client_anonymous';
+    try {
+      const user = await getCurrentUser();
+      if (user?.uid) clientId = user.uid;
+    } catch(e) {}
+
+    const result = await creerCommande(
+      clientId,
+      panierCheckout.ingredients,
+      adresse,
+      modePaiement,
+      preferences
+    );
+
+    if (result.success) {
+      // Vider le panier
+      try { await viderPanier(); } catch(e) {}
+      // Sauvegarder l'ID de commande pour la page suivi
+      try { localStorage.setItem('derniere_commande_id', result.commandeId); } catch(e) {}
+      // Afficher popup
+      document.getElementById('popup-commande-id').textContent = `Commande ${result.commandeId}`;
+      document.getElementById('popup-confirmation').classList.remove('hidden');
+    } else {
+      showToast(result.message || 'Une erreur est survenue');
+      btn.disabled = false;
+      btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">check_circle</span><span id="submit-label">${modePaiement === 'carte' ? 'Payer' : 'Valider la commande'}</span>`;
+    }
+
+  } catch (e) {
+    console.error('[checkout] soumettre :', e);
+    showToast('Erreur réseau. Réessayez.');
+    btn.disabled = false;
+    btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">check_circle</span><span id="submit-label">${modePaiement === 'carte' ? 'Payer' : 'Valider la commande'}</span>`;
+  }
+};
+
+// ===== UTILS =====
+function _getPrefs() {
+  try {
+    const raw = localStorage.getItem('ethniceats_preferences');
+    return raw ? JSON.parse(raw) : { sourcePreferee: 'mix', budget: 'moyen', priorite: 'moins_cher' };
+  } catch(e) { return { sourcePreferee: 'mix', budget: 'moyen', priorite: 'moins_cher' }; }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3000);
+}
+</script>
+
+</body>
+</html>

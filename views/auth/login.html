@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>EthnicEats - Se connecter</title>
+
+  <!-- Google Fonts: Manrope -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "inverse-surface": "#303030",
+            "secondary-fixed-dim": "#e9c176",
+            "on-primary-container": "#86af99",
+            "tertiary-fixed-dim": "#cac6bf",
+            "surface-container": "#f0eded",
+            "on-background": "#1b1c1c",
+            "error-container": "#ffdad6",
+            "on-secondary": "#ffffff",
+            "on-error-container": "#93000a",
+            "primary-fixed": "#c1ecd4",
+            "on-tertiary-container": "#aaa6a0",
+            "surface-bright": "#fcf9f8",
+            "secondary": "#775a19",
+            "error": "#ba1a1a",
+            "surface-container-highest": "#e5e2e1",
+            "primary-fixed-dim": "#a5d0b9",
+            "secondary-container": "#fed488",
+            "on-primary-fixed": "#002114",
+            "inverse-primary": "#a5d0b9",
+            "on-tertiary-fixed-variant": "#484742",
+            "on-secondary-fixed": "#261900",
+            "surface-variant": "#e5e2e1",
+            "tertiary": "#282622",
+            "on-error": "#ffffff",
+            "tertiary-container": "#3e3c37",
+            "surface-container-high": "#eae7e7",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed-variant": "#5d4201",
+            "tertiary-fixed": "#e6e2db",
+            "primary-container": "#1b4332",
+            "outline-variant": "#c1c8c2",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f6f3f2",
+            "on-secondary-container": "#785a1a",
+            "on-primary-fixed-variant": "#274e3d",
+            "secondary-fixed": "#ffdea5",
+            "outline": "#717973",
+            "inverse-on-surface": "#f3f0ef",
+            "background": "#fcf9f8",
+            "on-surface-variant": "#414844",
+            "surface-dim": "#dcd9d9",
+            "on-tertiary-fixed": "#1d1c18",
+            "surface-tint": "#3f6653",
+            "surface": "#fcf9f8",
+            "on-primary": "#ffffff",
+            "primary": "#012d1d",
+            "on-surface": "#1b1c1c"
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px"
+          },
+          fontFamily: {
+            headline: ["Manrope", "sans-serif"],
+            body: ["Manrope", "sans-serif"],
+            label: ["Manrope", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: max(884px, 100dvh);
+    }
+
+    /* Spinner animation */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #ffffff;
+      border-radius: 9999px;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    /* Toast notification */
+    #toast {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #toast.hidden {
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed">
+
+  <!-- TopAppBar -->
+  <header class="w-full top-0 sticky bg-surface z-50 flex items-center justify-between px-6 py-4 h-16">
+    <!-- Flèche retour → choix-role.html -->
+    <button
+      id="btn-retour"
+      aria-label="Retour"
+      class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 flex items-center justify-center"
+    >
+      <a href="/">
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+    </a>
+    </button>
+
+    <!-- Brand -->
+    <h1 class="font-headline font-black tracking-tighter text-primary text-2xl absolute left-1/2 -translate-x-1/2">
+      EthnicEats
+    </h1>
+
+    <div class="w-6"></div>
+  </header>
+
+  <!-- Toast "Fonctionnalité à venir" -->
+  <div
+    id="toast"
+    role="status"
+    class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-tertiary-container text-on-surface px-5 py-3 rounded-xl shadow-md font-label text-sm font-semibold"
+  >
+    Fonctionnalité à venir 🚧
+  </div>
+
+  <!-- Main -->
+  <main class="flex-grow flex flex-col px-6 py-12 max-w-md mx-auto w-full justify-center pb-24">
+
+    <!-- Header Section -->
+    <div class="mb-12">
+      <h2 class="font-headline font-bold text-[2.5rem] leading-tight tracking-tight text-primary mb-3">
+        Se connecter
+      </h2>
+      <p class="font-body text-lg text-on-surface-variant">
+        Ravi de vous revoir !
+      </p>
+    </div>
+
+    <!-- Login Form -->
+    <div class="flex flex-col gap-6" id="login-form">
+
+      <!-- Email Field -->
+      <div class="flex flex-col">
+        <label class="font-label text-sm font-medium text-on-surface-variant mb-2 ml-1" for="email">
+          Adresse e-mail
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="nom@exemple.com"
+          autocomplete="email"
+          class="w-full bg-surface-container-low text-on-surface px-5 py-4 rounded-md outline-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:bg-surface-container-high focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/40 font-body border-none"
+        />
+        <!-- Error email -->
+        <p id="error-email" class="hidden mt-2 ml-1 text-xs font-medium text-error font-label"></p>
+      </div>
+
+      <!-- Password Field -->
+      <div class="flex flex-col relative">
+        <label class="font-label text-sm font-medium text-on-surface-variant mb-2 ml-1" for="password">
+          Mot de passe
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          class="w-full bg-surface-container-low text-on-surface px-5 py-4 rounded-md outline-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] focus:bg-surface-container-high focus:ring-1 focus:ring-primary/20 placeholder:text-on-surface-variant/40 font-body border-none"
+        />
+        <!-- Error password -->
+        <p id="error-password" class="hidden mt-2 ml-1 text-xs font-medium text-error font-label"></p>
+
+        <!-- Forgot Password -->
+        <div class="flex justify-end mt-3">
+          <button
+            id="btn-forgot"
+            type="button"
+            class="font-label text-sm font-semibold text-secondary hover:opacity-80 transition-opacity ease-[cubic-bezier(0.4,0,0.2,1)]"
+          >
+          <a href="/forgotpassword">
+            Mot de passe oublié ?
+            </a>
+          </button>
+        </div>
+      </div>
+
+      <!-- Global error message (from controller) -->
+      <p id="error-global" class="hidden text-sm font-medium text-error font-label text-center -mt-2"></p>
+
+      <!-- Submit Button -->
+      <div class="mt-8">
+        <button
+          id="btn-submit"
+          type="button"
+          class="w-full bg-gradient-to-b from-primary to-primary-container text-on-primary font-headline font-bold text-lg py-4 px-8 rounded-full shadow-[0px_12px_32px_rgba(27,28,28,0.06)] active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:opacity-95 flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          Se connecter
+        </button>
+      </div>
+    </div>
+
+    <!-- Switch to Register -->
+    <div class="mt-12 text-center">
+      <p class="font-body text-on-surface-variant">
+        Pas encore de compte ?
+        <a
+          href="register.html"
+          class="font-label font-bold text-primary ml-1 hover:text-secondary transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+        >
+          S'inscrire
+        </a>
+      </p>
+    </div>
+
+  </main>
+
+  <!-- Controller import -->
+  <script type="module">
+    import { handleLogin } from "../../controllers/authController.js";
+
+    // ── Éléments DOM ──────────────────────────────────────────────────────────
+    const emailInput    = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const btnSubmit     = document.getElementById("btn-submit");
+    const btnRetour     = document.getElementById("btn-retour");
+    const btnForgot     = document.getElementById("btn-forgot");
+    const errorEmail    = document.getElementById("error-email");
+    const errorPassword = document.getElementById("error-password");
+    const errorGlobal   = document.getElementById("error-global");
+    const toast         = document.getElementById("toast");
+
+    // ── Navigation ────────────────────────────────────────────────────────────
+    btnRetour.addEventListener("click", () => {
+      window.location.href = "/";
+    });
+
+    // ── Mot de passe oublié ───────────────────────────────────────────────────
+    btnForgot.addEventListener("click", () => {
+      window.location.href = "mot-de-passe-oublie.html";
+    });
+
+    // ── Helpers validation ────────────────────────────────────────────────────
+    function afficherErreur(el, msg) {
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+
+    function masquerErreur(el) {
+      el.textContent = "";
+      el.classList.add("hidden");
+    }
+
+    function validerEmail(val) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+    }
+
+    function validerFormulaire() {
+      let valide = true;
+
+      masquerErreur(errorEmail);
+      masquerErreur(errorPassword);
+      masquerErreur(errorGlobal);
+
+      const email = emailInput.value.trim();
+      const mdp   = passwordInput.value;
+
+      if (!email) {
+        afficherErreur(errorEmail, "L'adresse e-mail est requise.");
+        valide = false;
+      } else if (!validerEmail(email)) {
+        afficherErreur(errorEmail, "Veuillez saisir une adresse e-mail valide.");
+        valide = false;
+      }
+
+      if (!mdp) {
+        afficherErreur(errorPassword, "Le mot de passe est requis.");
+        valide = false;
+      }
+
+      return valide;
+    }
+
+    // ── Spinner helpers ───────────────────────────────────────────────────────
+    function activerSpinner() {
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = `<span class="spinner"></span>Connexion en cours…`;
+    }
+
+    function désactiverSpinner() {
+      btnSubmit.disabled = false;
+      btnSubmit.innerHTML = "Se connecter";
+    }
+
+    // ── Nettoyage erreurs inline au changement de champ ──────────────────────
+    emailInput.addEventListener("input", () => masquerErreur(errorEmail));
+    passwordInput.addEventListener("input", () => masquerErreur(errorPassword));
+
+    // ── Soumission ────────────────────────────────────────────────────────────
+    btnSubmit.addEventListener("click", async () => {
+      if (!validerFormulaire()) return;
+
+      const email = emailInput.value.trim();
+      const mdp   = passwordInput.value;
+
+      activerSpinner();
+
+      try {
+        const résultat = await handleLogin(email, mdp);
+
+        if (!résultat.success) {
+          afficherErreur(errorGlobal, résultat.message || "Identifiants incorrects. Veuillez réessayer.");
+        }
+        // En cas de succès, authController redirige automatiquement.
+      } catch (err) {
+        afficherErreur(errorGlobal, "Une erreur inattendue est survenue. Veuillez réessayer.");
+        console.error("[login.html]", err);
+      } finally {
+        désactiverSpinner();
+      }
+    });
+
+    // ── Soumission via Entrée ─────────────────────────────────────────────────
+    [emailInput, passwordInput].forEach(el => {
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") btnSubmit.click();
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>EthnicEats - Vérifiez votre email</title>
+  <!-- Google Fonts: Manrope -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Material Symbols -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-surface": "#303030",
+            "secondary-fixed-dim": "#e9c176",
+            "on-primary-container": "#86af99",
+            "tertiary-fixed-dim": "#cac6bf",
+            "surface-container": "#f0eded",
+            "on-background": "#1b1c1c",
+            "error-container": "#ffdad6",
+            "on-secondary": "#ffffff",
+            "on-error-container": "#93000a",
+            "primary-fixed": "#c1ecd4",
+            "on-tertiary-container": "#aaa6a0",
+            "surface-bright": "#fcf9f8",
+            "secondary": "#775a19",
+            "error": "#ba1a1a",
+            "surface-container-highest": "#e5e2e1",
+            "primary-fixed-dim": "#a5d0b9",
+            "secondary-container": "#fed488",
+            "on-primary-fixed": "#002114",
+            "inverse-primary": "#a5d0b9",
+            "on-tertiary-fixed-variant": "#484742",
+            "on-secondary-fixed": "#261900",
+            "surface-variant": "#e5e2e1",
+            "tertiary": "#282622",
+            "on-error": "#ffffff",
+            "tertiary-container": "#3e3c37",
+            "surface-container-high": "#eae7e7",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed-variant": "#5d4201",
+            "tertiary-fixed": "#e6e2db",
+            "primary-container": "#1b4332",
+            "outline-variant": "#c1c8c2",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f6f3f2",
+            "on-secondary-container": "#785a1a",
+            "on-primary-fixed-variant": "#274e3d",
+            "secondary-fixed": "#ffdea5",
+            "outline": "#717973",
+            "inverse-on-surface": "#f3f0ef",
+            "background": "#fcf9f8",
+            "on-surface-variant": "#414844",
+            "surface-dim": "#dcd9d9",
+            "on-tertiary-fixed": "#1d1c18",
+            "surface-tint": "#3f6653",
+            "surface": "#fcf9f8",
+            "on-primary": "#ffffff",
+            "primary": "#012d1d",
+            "on-surface": "#1b1c1c"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "headline": ["Manrope", "sans-serif"],
+            "body": ["Manrope", "sans-serif"],
+            "label": ["Manrope", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: max(884px, 100dvh);
+    }
+
+    /* Pulse animation for the email icon */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.9); opacity: 0.6; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.6; }
+    }
+    .icon-pulse {
+      animation: pulse-ring 2.4s ease-in-out infinite;
+    }
+
+    /* Fade-in on load */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeInUp 0.5s ease-out both;
+    }
+    .fade-in-delay-1 { animation-delay: 0.1s; }
+    .fade-in-delay-2 { animation-delay: 0.2s; }
+    .fade-in-delay-3 { animation-delay: 0.35s; }
+    .fade-in-delay-4 { animation-delay: 0.5s; }
+
+    /* Toast notification */
+    #toast {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #toast.hidden {
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+    }
+    #toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed">
+
+  <!-- TopAppBar -->
+  <header class="w-full top-0 sticky bg-surface z-50 flex items-center justify-between px-6 py-4 h-16">
+    <!-- Back arrow → register.html -->
+    <button
+      id="btn-back"
+      aria-label="Retour"
+      class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200 flex items-center justify-center"
+    >
+      <a href="/register">
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+        </a>
+    </button>
+    <!-- Brand -->
+    <h1 class="font-headline font-black tracking-tighter text-primary text-2xl absolute left-1/2 -translate-x-1/2">
+      EthnicEats
+    </h1>
+    <div class="w-6"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex flex-col px-6 py-12 max-w-md mx-auto w-full justify-center pb-24">
+
+    <!-- Email icon -->
+    <div class="fade-in flex justify-center mb-10">
+      <div class="icon-pulse flex items-center justify-center w-28 h-28 rounded-full bg-primary-fixed/40">
+        <span
+          class="material-symbols-outlined text-primary"
+          style="font-size: 64px; font-variation-settings: 'FILL' 0, 'wght' 300;"
+        >mark_email_unread</span>
+      </div>
+    </div>
+
+    <!-- Header text -->
+    <div class="mb-10 text-center fade-in fade-in-delay-1">
+      <h2 class="font-headline font-bold text-[2.5rem] leading-tight tracking-tight text-primary mb-4">
+        Vérifiez votre email
+      </h2>
+      <p class="font-body text-base text-on-surface-variant leading-relaxed">
+        Un lien de vérification a été envoyé à
+        <br/>
+        <span id="user-email" class="font-bold text-on-surface">…</span>.
+        <br/><br/>
+        Cliquez sur le lien dans l'email pour activer votre compte.
+      </p>
+    </div>
+
+    <!-- Feedback message (errors / info) -->
+    <div
+      id="feedback"
+      class="hidden mb-4 px-4 py-3 rounded-lg text-sm font-medium text-center"
+    ></div>
+
+    <!-- Primary CTA -->
+    <div class="fade-in fade-in-delay-2">
+      <button
+        id="btn-verify"
+        class="w-full bg-gradient-to-b from-primary to-primary-container text-on-primary font-headline font-bold text-lg py-4 px-8 rounded-full shadow-[0px_12px_32px_rgba(27,28,28,0.06)] active:scale-95 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:opacity-95 flex items-center justify-center gap-2"
+      >
+        <span id="btn-verify-text">J'ai vérifié mon email</span>
+        <span id="btn-verify-spinner" class="hidden">
+          <svg class="animate-spin h-5 w-5 text-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Resend link / countdown -->
+    <div class="mt-8 text-center fade-in fade-in-delay-3">
+      <p class="font-body text-on-surface-variant text-sm">
+        Vous n'avez pas reçu l'email ?
+      </p>
+      <div class="mt-2">
+        <!-- Resend button (visible when no cooldown) -->
+        <button
+          id="btn-resend"
+          class="font-label font-bold text-secondary hover:opacity-80 transition-opacity duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-sm"
+        >
+          Renvoyer l'email
+        </button>
+        <!-- Countdown (hidden by default) -->
+        <p
+          id="resend-countdown"
+          class="hidden font-label text-sm font-medium text-on-surface-variant/60"
+        >
+          Renvoyer dans <span id="countdown-value">30</span>s
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast notification -->
+  <div
+    id="toast"
+    class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-inverse-surface text-inverse-on-surface text-sm font-medium px-5 py-3 rounded-full shadow-lg"
+    role="status"
+    aria-live="polite"
+  ></div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       Script — MVC View Layer
+       Connects directly to authController without touching DOM from controller
+  ═══════════════════════════════════════════════════════════════ -->
+  <script type="module">
+    import {
+      handleVerificationOTP,
+    } from "/controllers/authController.js";
+
+    import {
+      getCurrentUser as fetchCurrentUser,
+      renvoyerEmailVerification,
+    } from "/services/authService.js";
+
+    // ── DOM refs ──────────────────────────────────────────────────────────────
+    const elEmail        = document.getElementById("user-email");
+    const elFeedback     = document.getElementById("feedback");
+    const btnVerify      = document.getElementById("btn-verify");
+    const btnVerifyText  = document.getElementById("btn-verify-text");
+    const btnVerifySpinner = document.getElementById("btn-verify-spinner");
+    const btnResend      = document.getElementById("btn-resend");
+    const elCountdown    = document.getElementById("resend-countdown");
+    const elCountdownVal = document.getElementById("countdown-value");
+    const btnBack        = document.getElementById("btn-back");
+    const toast          = document.getElementById("toast");
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    let countdownTimer   = null;
+    let cooldownActive   = false;
+    const COOLDOWN_SECS  = 30;
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    function showFeedback(message, type = "error") {
+      const isError = type === "error";
+      elFeedback.textContent = message;
+      elFeedback.className = [
+        "mb-4 px-4 py-3 rounded-lg text-sm font-medium text-center",
+        isError
+          ? "bg-error-container text-on-error-container"
+          : "bg-primary-fixed text-on-primary-fixed"
+      ].join(" ");
+      elFeedback.classList.remove("hidden");
+    }
+
+    function hideFeedback() {
+      elFeedback.classList.add("hidden");
+    }
+
+    function showToast(message, durationMs = 3000) {
+      toast.textContent = message;
+      toast.classList.remove("hidden");
+      toast.classList.add("visible");
+      setTimeout(() => {
+        toast.classList.remove("visible");
+        setTimeout(() => toast.classList.add("hidden"), 300);
+      }, durationMs);
+    }
+
+    function setVerifyLoading(loading) {
+      btnVerify.disabled = loading;
+      btnVerifyText.textContent = loading ? "Vérification…" : "J'ai vérifié mon email";
+      btnVerifySpinner.classList.toggle("hidden", !loading);
+    }
+
+    function startCooldown() {
+      if (cooldownActive) return;
+      cooldownActive = true;
+      let remaining = COOLDOWN_SECS;
+
+      btnResend.classList.add("hidden");
+      elCountdown.classList.remove("hidden");
+      elCountdownVal.textContent = remaining;
+
+      countdownTimer = setInterval(() => {
+        remaining -= 1;
+        elCountdownVal.textContent = remaining;
+        if (remaining <= 0) {
+          clearInterval(countdownTimer);
+          cooldownActive = false;
+          elCountdown.classList.add("hidden");
+          btnResend.classList.remove("hidden");
+        }
+      }, 1000);
+    }
+
+    // ── Init: display user email ───────────────────────────────────────────────
+    (async () => {
+      try {
+        const user = await fetchCurrentUser();
+        if (user && user.email) {
+          elEmail.textContent = user.email;
+        } else {
+          // Fallback: try sessionStorage (set by some flows)
+          const storedEmail = sessionStorage.getItem("ee_email_pending") || "";
+          elEmail.textContent = storedEmail || "votre adresse email";
+        }
+      } catch {
+        elEmail.textContent = "votre adresse email";
+      }
+    })();
+
+    // ── Back button → register route ───────────────────────────────────────────
+    btnBack.addEventListener("click", () => {
+      window.location.href = "/register";
+    });
+
+    // ── Primary CTA: check verification ───────────────────────────────────────
+    btnVerify.addEventListener("click", async () => {
+      hideFeedback();
+      setVerifyLoading(true);
+
+      try {
+        const résultat = await handleVerificationOTP();
+        // If handleVerificationOTP redirects, execution stops here.
+        // If it returns (email not yet verified), show a message.
+        if (!résultat.success || !résultat.vérifié) {
+          showFeedback(
+            résultat.message ||
+            "Votre email n'a pas encore été vérifié. Cliquez sur le lien reçu par email, puis réessayez."
+          );
+        }
+      } catch (err) {
+        showFeedback("Une erreur est survenue. Veuillez réessayer.");
+      } finally {
+        setVerifyLoading(false);
+      }
+    });
+
+    // ── Silent auto-check on load ───────────────────────────────────────────
+    // If the user already clicked the verification link and came back,
+    // this will redirect to /preferences (client) or the proper role page.
+    // If not verified yet, it simply stays on this page.
+    (async () => {
+      try {
+        await handleVerificationOTP();
+      } catch {
+        // Silent on purpose
+      }
+    })();
+
+    // ── Resend email ───────────────────────────────────────────────────────────
+    btnResend.addEventListener("click", async () => {
+      if (cooldownActive) return;
+
+      try {
+        const resultat = await renvoyerEmailVerification();
+        if (!resultat.success) {
+          showFeedback(resultat.message || "Impossible de renvoyer l'email. Veuillez vous reconnecter.");
+          return;
+        }
+
+        showToast("Email de vérification renvoyé ✓");
+        startCooldown();
+      } catch (err) {
+        // If the function doesn't exist in the service, try Firebase directly.
+        try {
+          const { getAuth, sendEmailVerification } = await import(
+            "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
+          );
+          const auth = getAuth();
+          if (auth.currentUser) {
+            await sendEmailVerification(auth.currentUser);
+            showToast("Email de vérification renvoyé ✓");
+            startCooldown();
+          } else {
+            showFeedback("Impossible de renvoyer l'email. Veuillez vous reconnecter.");
+          }
+        } catch (firebaseErr) {
+          showFeedback("Erreur lors du renvoi de l'email. Veuillez réessayer dans un moment.");
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
