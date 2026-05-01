@@ -31,6 +31,7 @@
 
 import {
   sauvegarderCommande,
+  getCommande,
   getCommandesClient,
   mettreAJourStatutCommande,
 } from "../services/firestoreService.js";
@@ -310,22 +311,10 @@ async function getDetailCommande(commandeId) {
       return { success: false, commande: null, message: "Identifiant commande invalide." };
     }
 
-    // Récupération via la collection commandes (pas de getCommande directe dans firestoreService,
-    // on recharge toutes les commandes et on filtre — ou on utilise sauvegarderCommande en lecture)
-    // On passe par une requête ciblée via getCommandesClient n'est pas adapté ici.
-    // → Import dynamique de doc/getDoc pour cibler directement le document.
-    const { db } = await import("../services/firebase.js");
-    const { doc, getDoc } = await import(
-      "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js"
-    );
-
-    const snap = await getDoc(doc(db, "commandes", commandeId));
-
-    if (!snap.exists()) {
+    const commande = await getCommande(commandeId);
+    if (!commande) {
       return { success: false, commande: null, message: "Commande introuvable." };
     }
-
-    const commande = { id: snap.id, ...snap.data() };
 
     return { success: true, commande, message: "" };
 

@@ -2,10 +2,11 @@
 CREATE TABLE IF NOT EXISTS utilisateurs (
     uid VARCHAR(64) PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
+    motDePasse VARCHAR(255) NOT NULL,
     emailVerifie BOOLEAN DEFAULT FALSE,
     nomComplet VARCHAR(255),
     telephone VARCHAR(50),
-    budgetMax BIGINT,
+    budgetMax BIGINT DEFAULT 0,
     preferencesDefinies BOOLEAN DEFAULT FALSE,
     priorite VARCHAR(50),
     role VARCHAR(50),
@@ -14,7 +15,16 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
     adresseLivraison JSON,
     creeLe TIMESTAMP,
     ville VARCHAR(100),
-    adresse VARCHAR(255)
+    adresse VARCHAR(255),
+    gainsTotaux DECIMAL(10,2) DEFAULT 0,
+    nbLivraisons INT DEFAULT 0,
+    statutActuel VARCHAR(50) DEFAULT 'disponible',
+    permisImage VARCHAR(255),
+    verificationToken VARCHAR(64),
+    resetToken VARCHAR(64),
+    resetTokenExpires TIMESTAMP NULL,
+    sessionToken VARCHAR(64),
+    sessionTokenExpires TIMESTAMP NULL
 );
 
 -- Commandes table matching Firebase structure
@@ -23,7 +33,7 @@ CREATE TABLE IF NOT EXISTS commandes (
     clientId VARCHAR(64),
     archivee BOOLEAN DEFAULT FALSE,
     dateCreation VARCHAR(50),
-    fraisLivraison BIGINT,
+    fraisLivraison DECIMAL(10,2),
     livreurId VARCHAR(64),
     livreurNom VARCHAR(255),
     livreurTelephone VARCHAR(50),
@@ -31,9 +41,10 @@ CREATE TABLE IF NOT EXISTS commandes (
     nbIngredients INT,
     panier JSON,
     pointsCollecte JSON,
-    prixTotal BIGINT,
+    adresseLivraison JSON,
+    prixTotal DECIMAL(10,2),
     sourcePreferee VARCHAR(50),
-    sousTotal BIGINT,
+    sousTotal DECIMAL(10,2),
     statut VARCHAR(50),
     tempsEstime INT,
     updatedAt TIMESTAMP,

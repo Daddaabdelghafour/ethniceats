@@ -30,6 +30,8 @@ import {
   getUtilisateur,
   sauvegarderUtilisateur,
   getCommandesDisponibles   as fsGetCommandesDisponibles,
+  getCommandesLivreurEnCours,
+  getCommande,
   getHistoriqueLivreur,
   mettreAJourStatutCommande,
   sauvegarderCommande,
@@ -97,8 +99,7 @@ export async function getCommandesDisponibles() {
  *
  * @param {Function} callback - appelé à chaque changement :
  *                              callback(commandeIds: string[], erreur?: Error)
- * @returns {import('firebase/database').DatabaseReference} référence active
- *          (passer à stopperEcouteCommandes() pour arrêter)
+ * @returns {Object} référence active (passer à stopperEcouteCommandes() pour arrêter)
  */
 export function ecouterNouvellesCommandesLivreur(callback) {
   try {
@@ -115,7 +116,7 @@ export function ecouterNouvellesCommandesLivreur(callback) {
 /**
  * Arrête un listener de commandes précédemment démarré.
  *
- * @param {import('firebase/database').DatabaseReference | null} reference
+ * @param {Object | null} reference
  */
 export function stopperEcouteCommandes(reference) {
   stopperEcoute(reference);
@@ -134,8 +135,8 @@ export function stopperEcouteCommandes(reference) {
  *  4. Met à jour la commande dans Firestore (livreurId + statut "confirmee")
  *  5. Met à jour le statut du livreur dans Firestore (statutActuel "en_livraison")
  *
- * Les infos du livreur (nom + telephoneContact) sont envoyées au client via
- * le nœud RTDB `livreurs/{livreurId}` par assignerLivreurRealtime().
+ * Les infos du livreur (nom + telephoneContact) sont persistées avec la commande
+ * pour être accessibles côté client.
  *
  * @param {string} livreurId  - UID du livreur
  * @param {string} commandeId - identifiant de la commande (ex : "ORD-1024")
@@ -161,12 +162,15 @@ export async function accepterCommande(livreurId, commandeId) {
     //    - écrit dans livreurs/{livreurId} les infos visibles par le client
     await assignerLivreurRealtime(commandeId, livreurId);
 
-    // Publier les infos du livreur dans RTDB pour le client (nom + telephoneContact)
-    await _publierInfosLivreurRTDB(livreurId, livreur.nomComplet, livreur.telephoneContact);
-
     // 4. Mettre à jour la commande dans Firestore
     await mettreAJourStatutCommande(commandeId, 'confirmee');
-    await sauvegarderCommande({ id: commandeId, livreurId, statut: 'confirmee' });
+    await sauvegarderCommande({
+      id: commandeId,
+      livreurId,
+      livreurNom: livreur.nomComplet,
+      livreurTelephone: livreur.telephoneContact,
+      statut: 'confirmee',
+    });
 
     // 5. Mettre à jour le statut du livreur dans Firestore
     await sauvegarderUtilisateur(livreurId, livreur.versObjet());
@@ -198,19 +202,7 @@ export async function getCommandesEnCours(livreurId) {
     // Tous les statuts intermédiaires (après acceptation, avant livraison)
     const statutsEnCours = ['confirmee', 'en_preparation', 'en_livraison', 'arrive'];
 
-    const { collection, query, where, getDocs, orderBy } =
-      await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
-    const { db } = await import('../services/firebase.js');
-
-    const q    = query(
-      collection(db, 'commandes'),
-      where('livreurId', '==', livreurId),
-      where('statut',    'in', statutsEnCours),
-      orderBy('dateCreation', 'asc'),
-    );
-    const snap = await getDocs(q);
-
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return await getCommandesLivreurEnCours(livreurId, statutsEnCours);
 
   } catch (erreur) {
     console.error('[livreurController] getCommandesEnCours :', erreur);
@@ -423,18 +415,6 @@ export async function genererPointsCollecte(commande, preferences = {}) {
  * @param {string} telephone
  * @returns {Promise<void>}
  */
-async function _publierInfosLivreurRTDB(livreurId, nom, telephone) {
-  try {
-    const { ref, set }  = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js');
-    const { rtdb }      = await import('../services/firebase.js');
-
-    await set(ref(rtdb, `livreurs/${livreurId}`), { nom, telephone });
-  } catch (erreur) {
-    console.error('[livreurController] _publierInfosLivreurRTDB :', erreur);
-    throw erreur;
-  }
-}
-
 /**
  * Enregistre qu'une livraison est terminée :
  *  - Charge la commande pour récupérer les frais de livraison
@@ -447,17 +427,11 @@ async function _publierInfosLivreurRTDB(livreurId, nom, telephone) {
  */
 async function _enregistrerLivraisonTerminee(commandeId) {
   try {
-    // Charger la commande pour récupérer livreurId et fraisLivraison
-    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js');
-    const { db }          = await import('../services/firebase.js');
-
-    const snapCommande = await getDoc(doc(db, 'commandes', commandeId));
-    if (!snapCommande.exists()) {
+    const donnéesCommande = await getCommande(commandeId);
+    if (!donnéesCommande) {
       console.warn(`[livreurController] _enregistrerLivraisonTerminee : commande introuvable (id="${commandeId}").`);
       return;
     }
-
-    const donnéesCommande = snapCommande.data();
     const livreurId       = donnéesCommande.livreurId;
     const fraisLivraison  = donnéesCommande.fraisLivraison || 0;
 

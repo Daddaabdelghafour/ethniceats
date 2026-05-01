@@ -22,7 +22,7 @@
 
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -30,7 +30,34 @@ from flask_cors import CORS
 from controllers.prix_controller import calculer_panier, calculer_livraison
 from controllers.recherche_controller import rechercher, rechercher_par_categorie
 from controllers.livraison_controller import generer_plan_livraison, valider_adresse
-from services.mysql_user_service import email_exists, create_utilisateur
+from services.mysql_commande_service import (
+    create_commande,
+    get_commande,
+    get_commandes_client,
+    get_commandes_disponibles,
+    get_commandes_livreur,
+    get_historique_client,
+    get_historique_livreur,
+    update_commande,
+)
+from services.mysql_user_service import (
+    add_favori,
+    create_utilisateur,
+    email_exists,
+    get_favoris,
+    get_preferences,
+    get_utilisateur,
+    get_utilisateur_by_reset_token,
+    get_utilisateur_by_session_token,
+    is_verification_token_valid,
+    remove_favori,
+    set_session_token,
+    set_email_verified,
+    set_preferences,
+    set_reset_token,
+    update_utilisateur,
+    verify_password,
+)
 
 app = Flask(__name__)
 CORS(app)  # Autorise les appels depuis le frontend HTML
@@ -39,6 +66,39 @@ CORS(app)  # Autorise les appels depuis le frontend HTML
 def _abs(*parts: str) -> str:
     """Construit un chemin absolu basé sur le dossier de l'application."""
     return os.path.join(app.root_path, *parts)
+
+
+def _get_authenticated_user():
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return None
+    token = auth_header.split(" ", 1)[1].strip()
+    if not token:
+        return None
+    return get_utilisateur_by_session_token(token)
+
+
+def _require_auth(user_id: str | None = None):
+    user = _get_authenticated_user()
+    if not user:
+        return None
+    if user_id and user.get("uid") != user_id:
+        return None
+    return user
+
+
+def _can_access_commande(user, commande, updates=None) -> bool:
+    if not user or not commande:
+        return False
+    role = user.get("role")
+    if role == "client":
+        return commande.get("clientId") == user.get("uid")
+    if role == "livreur":
+        if commande.get("livreurId"):
+            return commande.get("livreurId") == user.get("uid")
+        if updates and updates.get("livreurId") == user.get("uid"):
+            return True
+    return False
 
 
 @app.route("/", methods=["GET"])
@@ -391,73 +451,310 @@ def route_valider_adresse():
     return jsonify(result)
 
 
-@app.route("/api/firebase-email-verified", methods=["POST"])
-def firebase_email_verified():
-    print("[DEBUG] /api/firebase-email-verified called")
-    try:
-        data = request.get_json()
-        print("[DEBUG] Data received:", data)
-        user_id = data.get("user_id")
-        if not user_id:
-            print("[DEBUG] user_id missing")
-            return jsonify({"success": False, "message": "user_id is required."}), 400
-        from services.mysql_user_service import set_email_verified
-        result = set_email_verified(user_id)
-        print("[DEBUG] set_email_verified result:", result)
-        if result:
-            return jsonify({"success": True, "message": "Email marqué comme vérifié dans MySQL."})
-        else:
-            return jsonify({"success": False, "message": "Erreur lors de la mise à jour."}), 500
-    except Exception as e:
-        print("[ERROR] Exception in /api/firebase-email-verified:", e)
-        import traceback
-        traceback.print_exc()
-        return jsonify({"success": False, "message": str(e)}), 500
-
-
 @app.route("/api/register", methods=["POST"])
 def register():
-    print("[DEBUG] /api/register called")
     try:
-        data = request.get_json()
-        print("[DEBUG] Data received:", data)
+        data = request.get_json() or {}
         email = data.get("email")
-        if not email:
-            print("[DEBUG] Email missing")
-            return jsonify({"success": False, "message": "Email requis."}), 400
+        mot_de_passe = data.get("motDePasse")
+        role = data.get("role")
+        if not email or not mot_de_passe:
+            return jsonify({"success": False, "message": "Email et mot de passe requis."}), 400
+        if role not in {"client", "livreur"}:
+            return jsonify({"success": False, "message": "Rôle invalide."}), 400
         if email_exists(email):
-            print("[DEBUG] Email already exists:", email)
             return jsonify({"success": False, "message": "Email déjà utilisé."}), 409
-        # Générer un UID unique pour l'utilisateur
+
+        verification_token = str(uuid.uuid4())
         user_data = {
             "uid": str(uuid.uuid4()),
             "email": email,
+            "motDePasse": mot_de_passe,
             "emailVerifie": False,
             "nomComplet": data.get("nomComplet"),
             "telephone": data.get("telephone"),
             "budgetMax": data.get("budgetMax", 0),
             "preferencesDefinies": data.get("preferencesDefinies", False),
             "priorite": data.get("priorite"),
-            "role": data.get("role"),
+            "role": role,
             "sourcePreferee": data.get("sourcePreferee"),
-            "favoris": data.get("favoris"),
+            "favoris": data.get("favoris") or [],
             "adresseLivraison": data.get("adresseLivraison"),
             "creeLe": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
             "ville": data.get("ville"),
-            "adresse": data.get("adresse")
+            "adresse": data.get("adresse"),
+            "gainsTotaux": data.get("gainsTotaux", 0),
+            "nbLivraisons": data.get("nbLivraisons", 0),
+            "statutActuel": data.get("statutActuel", "disponible"),
+            "permisImage": data.get("permisImage"),
+            "verificationToken": verification_token,
         }
-        print("[DEBUG] user_data:", user_data)
         result = create_utilisateur(user_data)
-        print("[DEBUG] create_utilisateur result:", result)
         if result:
-            return jsonify({"success": True, "message": "Inscription réussie.", "uid": user_data["uid"]})
-        else:
-            return jsonify({"success": False, "message": "Erreur lors de la création de l'utilisateur."}), 500
+            return jsonify(
+                {
+                    "success": True,
+                    "message": "Inscription réussie.",
+                    "uid": user_data["uid"],
+                    "verificationToken": verification_token,
+                }
+            )
+        return jsonify({"success": False, "message": "Erreur lors de la création de l'utilisateur."}), 500
     except Exception as e:
-        print("[ERROR] Exception in /api/register:", e)
-        import traceback
-        traceback.print_exc()
         return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    data = request.get_json() or {}
+    email = data.get("email")
+    mot_de_passe = data.get("motDePasse")
+    if not email or not mot_de_passe:
+        return jsonify({"success": False, "message": "Email et mot de passe requis."}), 400
+
+    utilisateur = verify_password(email, mot_de_passe)
+    if not utilisateur:
+        return jsonify({"success": False, "message": "Identifiants incorrects."}), 401
+
+    if not utilisateur.get("emailVerifie"):
+        return jsonify(
+            {
+                "success": False,
+                "emailVerifie": False,
+                "user": utilisateur,
+                "message": "Votre email n'est pas encore vérifié.",
+            }
+        ), 403
+
+    session_token = str(uuid.uuid4())
+    expires_at = datetime.utcnow() + timedelta(hours=12)
+    set_session_token(utilisateur["uid"], session_token, expires_at)
+
+    return jsonify({"success": True, "user": utilisateur, "sessionToken": session_token})
+
+
+@app.route("/api/email/verify", methods=["POST"])
+def verify_email():
+    data = request.get_json() or {}
+    uid = data.get("uid")
+    if not uid:
+        return jsonify({"success": False, "message": "uid requis."}), 400
+    utilisateur = get_utilisateur(uid)
+    if not utilisateur:
+        return jsonify({"success": False, "message": "Utilisateur introuvable."}), 404
+    if not set_email_verified(uid):
+        return jsonify({"success": False, "message": "Erreur lors de la vérification."}), 500
+    utilisateur = get_utilisateur(uid)
+    return jsonify({"success": True, "role": utilisateur.get("role"), "user": utilisateur})
+
+
+@app.route("/api/email/resend", methods=["POST"])
+def resend_email_verification():
+    data = request.get_json() or {}
+    uid = data.get("uid")
+    if not uid:
+        return jsonify({"success": False, "message": "uid requis."}), 400
+    token = str(uuid.uuid4())
+    if not update_utilisateur(uid, {"verificationToken": token, "emailVerifie": False}):
+        return jsonify({"success": False, "message": "Impossible de régénérer la vérification."}), 500
+    return jsonify({"success": True, "verificationToken": token})
+
+
+@app.route("/api/users/<user_id>", methods=["GET"])
+def get_user(user_id):
+    utilisateur = get_utilisateur(user_id)
+    if not utilisateur:
+        return jsonify({"success": False, "message": "Utilisateur introuvable."}), 404
+    return jsonify({"success": True, "user": utilisateur})
+
+
+@app.route("/api/users/<user_id>", methods=["PUT"])
+def update_user(user_id):
+    data = request.get_json() or {}
+    updates = {}
+    if "nomComplet" in data:
+        updates["nomComplet"] = data.get("nomComplet")
+    if "telephoneContact" in data:
+        updates["telephone"] = data.get("telephoneContact")
+    if "telephone" in data:
+        updates["telephone"] = data.get("telephone")
+    email_change = False
+    if "email" in data:
+        updates["email"] = data.get("email")
+        updates["emailVerifie"] = False
+        updates["verificationToken"] = str(uuid.uuid4())
+        email_change = True
+    if "ville" in data:
+        updates["ville"] = data.get("ville")
+    if "adresse" in data:
+        updates["adresse"] = data.get("adresse")
+
+    if not updates:
+        return jsonify({"success": False, "message": "Aucune donnée à mettre à jour."}), 400
+
+    if not update_utilisateur(user_id, updates):
+        return jsonify({"success": False, "message": "Mise à jour impossible."}), 500
+
+    utilisateur = get_utilisateur(user_id)
+    return jsonify(
+        {
+            "success": True,
+            "user": utilisateur,
+            "emailChange": email_change,
+            "verificationToken": updates.get("verificationToken"),
+        }
+    )
+
+
+@app.route("/api/users/<user_id>/password", methods=["PUT"])
+def update_password(user_id):
+    data = request.get_json() or {}
+    ancien = data.get("ancienMdp")
+    nouveau = data.get("nouveauMdp")
+    if not ancien or not nouveau:
+        return jsonify({"success": False, "message": "Ancien et nouveau mot de passe requis."}), 400
+    utilisateur = get_utilisateur(user_id)
+    if not utilisateur:
+        return jsonify({"success": False, "message": "Utilisateur introuvable."}), 404
+    if verify_password(utilisateur.get("email", ""), ancien) is None:
+        return jsonify({"success": False, "message": "Mot de passe actuel incorrect."}), 403
+    if not update_utilisateur(user_id, {"motDePasse": nouveau}):
+        return jsonify({"success": False, "message": "Mise à jour impossible."}), 500
+    return jsonify({"success": True, "message": "Mot de passe mis à jour."})
+
+
+@app.route("/api/password/reset-request", methods=["POST"])
+def reset_password_request():
+    data = request.get_json() or {}
+    email = data.get("email")
+    if not email:
+        return jsonify({"success": False, "message": "Email requis."}), 400
+    if not email_exists(email):
+        return jsonify({"success": False, "message": "Aucun compte trouvé avec cet email."}), 404
+    token = str(uuid.uuid4())
+    expires_at = datetime.utcnow() + timedelta(hours=1)
+    if not set_reset_token(email, token, expires_at):
+        return jsonify({"success": False, "message": "Impossible de créer la demande."}), 500
+    return jsonify({"success": True, "message": "Demande enregistrée."})
+
+
+@app.route("/api/password/reset", methods=["POST"])
+def reset_password():
+    data = request.get_json() or {}
+    token = data.get("token")
+    nouveau = data.get("nouveauMdp")
+    if not token or not nouveau:
+        return jsonify({"success": False, "message": "Token et nouveau mot de passe requis."}), 400
+    utilisateur = get_utilisateur_by_reset_token(token)
+    if not utilisateur:
+        return jsonify({"success": False, "message": "Token invalide ou expiré."}), 404
+    if not update_utilisateur(utilisateur["uid"], {"motDePasse": nouveau, "resetToken": None, "resetTokenExpires": None}):
+        return jsonify({"success": False, "message": "Impossible de réinitialiser le mot de passe."}), 500
+    return jsonify({"success": True, "message": "Mot de passe réinitialisé."})
+
+
+@app.route("/api/users/<user_id>/preferences", methods=["GET"])
+def get_user_preferences(user_id):
+    preferences = get_preferences(user_id)
+    if preferences is None:
+        return jsonify({"success": False, "message": "Utilisateur introuvable."}), 404
+    return jsonify({"success": True, "preferences": preferences})
+
+
+@app.route("/api/users/<user_id>/preferences", methods=["PUT"])
+def update_user_preferences(user_id):
+    data = request.get_json() or {}
+    if not set_preferences(user_id, data):
+        return jsonify({"success": False, "message": "Impossible d'enregistrer les préférences."}), 500
+    return jsonify({"success": True, "message": "Préférences enregistrées."})
+
+
+@app.route("/api/users/<user_id>/favoris", methods=["GET"])
+def get_user_favoris(user_id):
+    return jsonify({"success": True, "favoris": get_favoris(user_id)})
+
+
+@app.route("/api/users/<user_id>/favoris", methods=["POST"])
+def add_user_favori(user_id):
+    data = request.get_json() or {}
+    recette_id = data.get("recetteId")
+    if not recette_id:
+        return jsonify({"success": False, "message": "recetteId requis."}), 400
+    favoris = add_favori(user_id, recette_id)
+    return jsonify({"success": True, "favoris": favoris})
+
+
+@app.route("/api/users/<user_id>/favoris/<recette_id>", methods=["DELETE"])
+def remove_user_favori(user_id, recette_id):
+    favoris = remove_favori(user_id, recette_id)
+    return jsonify({"success": True, "favoris": favoris})
+
+
+@app.route("/api/commandes", methods=["POST"])
+def create_commande_route():
+    data = request.get_json() or {}
+    if not data.get("clientId"):
+        return jsonify({"success": False, "message": "Commande invalide."}), 400
+    if not data.get("id"):
+        data["id"] = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+    if create_commande(data):
+        return jsonify({"success": True, "commandeId": data["id"]})
+    return jsonify({"success": False, "message": "Erreur lors de la création."}), 500
+
+
+@app.route("/api/commandes/<commande_id>", methods=["GET"])
+def get_commande_route(commande_id):
+    commande = get_commande(commande_id)
+    if not commande:
+        return jsonify({"success": False, "message": "Commande introuvable."}), 404
+    return jsonify({"success": True, "commande": commande})
+
+
+@app.route("/api/commandes/<commande_id>", methods=["PUT"])
+def update_commande_route(commande_id):
+    data = request.get_json() or {}
+    if not update_commande(commande_id, data):
+        return jsonify({"success": False, "message": "Impossible de mettre à jour."}), 500
+    return jsonify({"success": True})
+
+
+@app.route("/api/commandes", methods=["GET"])
+def list_commandes():
+    client_id = request.args.get("clientId")
+    livreur_id = request.args.get("livreurId")
+    if client_id:
+        return jsonify({"success": True, "commandes": get_commandes_client(client_id)})
+    if livreur_id:
+        statuts = request.args.get("statut")
+        statuts_list = statuts.split(",") if statuts else None
+        return jsonify({"success": True, "commandes": get_commandes_livreur(livreur_id, statuts_list)})
+    return jsonify({"success": True, "commandes": []})
+
+
+@app.route("/api/commandes/disponibles", methods=["GET"])
+def commandes_disponibles():
+    return jsonify({"success": True, "commandes": get_commandes_disponibles()})
+
+
+@app.route("/api/commandes/livreur/en-cours", methods=["GET"])
+def commandes_livreur_en_cours():
+    livreur_id = request.args.get("livreurId")
+    if not livreur_id:
+        return jsonify({"success": False, "message": "livreurId requis."}), 400
+    statuts = ["confirmee", "en_preparation", "en_livraison", "arrive"]
+    commandes = get_commandes_livreur(livreur_id, statuts)
+    return jsonify({"success": True, "commandes": commandes})
+
+
+@app.route("/api/commandes/historique", methods=["GET"])
+def commandes_historique():
+    client_id = request.args.get("clientId")
+    livreur_id = request.args.get("livreurId")
+    if client_id:
+        return jsonify({"success": True, "commandes": get_historique_client(client_id)})
+    if livreur_id:
+        return jsonify({"success": True, "commandes": get_historique_livreur(livreur_id)})
+    return jsonify({"success": False, "message": "clientId ou livreurId requis."}), 400
 
 
 # ─── Lancement ────────────────────────────────────────────────────────────────
@@ -467,5 +764,3 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     debug = os.environ.get("FLASK_ENV") != "production"
     app.run(host="0.0.0.0", port=port, debug=debug)
-
-
