@@ -10,9 +10,11 @@ from .mysql_service import get_db_connection
 JSON_FIELDS = {"panier", "pointsCollecte", "adresseLivraison"}
 
 
-def _validate_columns(fields) -> bool:
-    for field in fields:
-        column = field.split("=", 1)[0].strip()
+def _validate_columns(columns, allowed) -> bool:
+    allowed_set = set(allowed)
+    for column in columns:
+        if column not in allowed_set:
+            return False
         if not re.match(r"^[a-zA-Z_]+$", column):
             return False
     return True
@@ -118,6 +120,7 @@ def update_commande(commande_id: str, updates: Dict[str, Any]) -> bool:
         updates = {**updates, "archivee": True}
 
     fields = []
+    columns = []
     values = []
     for key, column in allowed.items():
         if key not in updates:
@@ -126,12 +129,13 @@ def update_commande(commande_id: str, updates: Dict[str, Any]) -> bool:
         if key in JSON_FIELDS:
             value = _serialize_json(value)
         fields.append(f"{column} = %s")
+        columns.append(column)
         values.append(value)
 
     if not fields:
         return False
 
-    if not _validate_columns(fields):
+    if not _validate_columns(columns, allowed.values()):
         return False
 
     fields.append("updatedAt = NOW()")

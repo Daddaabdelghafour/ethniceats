@@ -10,11 +10,14 @@ from .mysql_service import get_db_connection
 
 
 JSON_FIELDS = {"favoris", "adresseLivraison"}
+SENSITIVE_FIELDS = {"verificationToken", "resetToken", "resetTokenExpires", "sessionToken", "sessionTokenExpires"}
 
 
-def _validate_columns(fields) -> bool:
-    for field in fields:
-        column = field.split("=", 1)[0].strip()
+def _validate_columns(columns, allowed) -> bool:
+    allowed_set = set(allowed)
+    for column in columns:
+        if column not in allowed_set:
+            return False
         if not re.match(r"^[a-zA-Z_]+$", column):
             return False
     return True
@@ -44,6 +47,8 @@ def _sanitize_utilisateur(row: Optional[Dict[str, Any]]) -> Optional[Dict[str, A
         return None
     row = dict(row)
     row.pop("motDePasse", None)
+    for field in SENSITIVE_FIELDS:
+        row.pop(field, None)
     if "telephone" in row and "telephoneContact" not in row:
         row["telephoneContact"] = row.get("telephone")
     for field in JSON_FIELDS:
@@ -182,9 +187,12 @@ def update_utilisateur(user_id: str, updates: Dict[str, Any]) -> bool:
         "verificationToken": "verificationToken",
         "resetToken": "resetToken",
         "resetTokenExpires": "resetTokenExpires",
+        "sessionToken": "sessionToken",
+        "sessionTokenExpires": "sessionTokenExpires",
     }
 
     fields = []
+    columns = []
     values = []
     for key, column in allowed.items():
         if key not in updates:
@@ -195,12 +203,13 @@ def update_utilisateur(user_id: str, updates: Dict[str, Any]) -> bool:
         if key in JSON_FIELDS:
             value = _serialize_json(value)
         fields.append(f"{column} = %s")
+        columns.append(column)
         values.append(value)
 
     if not fields:
         return False
 
-    if not _validate_columns(fields):
+    if not _validate_columns(columns, allowed.values()):
         return False
 
     conn = get_db_connection()
@@ -231,6 +240,50 @@ def set_reset_token(email: str, token: str, expires_at) -> bool:
 
 def clear_reset_token(user_id: str) -> bool:
     return update_utilisateur(user_id, {"resetToken": None, "resetTokenExpires": None})
+
+
+def set_session_token(user_id: str, token: str, expires_at=None) -> bool:
+    return update_utilisateur(user_id, {"sessionToken": token, "sessionTokenExpires": expires_at})
+
+
+def clear_session_token(user_id: str) -> bool:
+    return update_utilisateur(user_id, {"sessionToken": None, "sessionTokenExpires": None})
+
+
+def get_utilisateur_by_session_token(token: str) -> Optional[Dict[str, Any]]:
+    conn = get_db_connection()
+    if not conn:
+        return None
+    try:
+        with conn.cursor(dictionary=True) as cur:
+            cur.execute(
+                '''
+                SELECT * FROM utilisateurs
+                WHERE sessionToken = %s
+                AND (sessionTokenExpires IS NULL OR sessionTokenExpires > NOW())
+                ''',
+                (token,),
+            )
+            row = cur.fetchone()
+            return _sanitize_utilisateur(row)
+    finally:
+        conn.close()
+
+
+def is_verification_token_valid(user_id: str, token: str) -> bool:
+    conn = get_db_connection()
+    if not conn:
+        return False
+    try:
+        with conn.cursor(dictionary=True) as cur:
+            cur.execute(
+                "SELECT verificationToken FROM utilisateurs WHERE uid = %s",
+                (user_id,),
+            )
+            row = cur.fetchone()
+            return bool(row and row.get("verificationToken") == token)
+    finally:
+        conn.close()
 
 
 def get_preferences(user_id: str) -> Optional[Dict[str, Any]]:

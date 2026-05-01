@@ -22,7 +22,9 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
     permisImage VARCHAR(255),
     verificationToken VARCHAR(64),
     resetToken VARCHAR(64),
-    resetTokenExpires TIMESTAMP NULL
+    resetTokenExpires TIMESTAMP NULL,
+    sessionToken VARCHAR(64),
+    sessionTokenExpires TIMESTAMP NULL
 );
 
 -- Commandes table matching Firebase structure

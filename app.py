@@ -48,7 +48,10 @@ from services.mysql_user_service import (
     get_preferences,
     get_utilisateur,
     get_utilisateur_by_reset_token,
+    get_utilisateur_by_session_token,
+    is_verification_token_valid,
     remove_favori,
+    set_session_token,
     set_email_verified,
     set_preferences,
     set_reset_token,
@@ -63,6 +66,39 @@ CORS(app)  # Autorise les appels depuis le frontend HTML
 def _abs(*parts: str) -> str:
     """Construit un chemin absolu basé sur le dossier de l'application."""
     return os.path.join(app.root_path, *parts)
+
+
+def _get_authenticated_user():
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return None
+    token = auth_header.split(" ", 1)[1].strip()
+    if not token:
+        return None
+    return get_utilisateur_by_session_token(token)
+
+
+def _require_auth(user_id: str | None = None):
+    user = _get_authenticated_user()
+    if not user:
+        return None
+    if user_id and user.get("uid") != user_id:
+        return None
+    return user
+
+
+def _can_access_commande(user, commande, updates=None) -> bool:
+    if not user or not commande:
+        return False
+    role = user.get("role")
+    if role == "client":
+        return commande.get("clientId") == user.get("uid")
+    if role == "livreur":
+        if commande.get("livreurId"):
+            return commande.get("livreurId") == user.get("uid")
+        if updates and updates.get("livreurId") == user.get("uid"):
+            return True
+    return False
 
 
 @app.route("/", methods=["GET"])
@@ -490,7 +526,11 @@ def login():
             }
         ), 403
 
-    return jsonify({"success": True, "user": utilisateur})
+    session_token = str(uuid.uuid4())
+    expires_at = datetime.utcnow() + timedelta(hours=12)
+    set_session_token(utilisateur["uid"], session_token, expires_at)
+
+    return jsonify({"success": True, "user": utilisateur, "sessionToken": session_token})
 
 
 @app.route("/api/email/verify", methods=["POST"])
